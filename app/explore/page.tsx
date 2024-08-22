@@ -2,7 +2,7 @@ import React from 'react'
 
 const Explore = () => {
     return (
-        <div>Explore page</div>
+        <div className="font-istok text-white text-3xl">Explore page</div>
     )
 }
 
