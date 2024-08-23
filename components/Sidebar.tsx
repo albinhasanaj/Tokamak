@@ -23,20 +23,27 @@ const Sidebar = () => {
                 <nav className='py-5'>
                     <p className="text-white text-xl font-bold font-istok pl-5 pb-4 pt-7 select-none">Menu</p>
                     <ul className='select-none'>
-                        <li onClick={() => handleSelect(0)} className={`flex cursor-pointer items-center pl-5 h-[60px] gap-4 rounded-md ${selectedIndex === 0 ? "bg-[#ff4e2c]" : "bg-transparent"}`}>
-                            <Image src="/images/home.svg" width={24} height={24} alt="Home" draggable="false" />
-                            <Link href='' className='text-white text-xl font-bold'>Home</Link>
-                        </li>
-                        <li onClick={() => handleSelect(1)} className={`flex cursor-pointer items-center pl-5 h-[60px] gap-4 rounded-md ${selectedIndex === 1 ? "bg-[#ff4e2c]" : "bg-transparent"}`}>
-                            <Image src="/images/explore.svg" width={24} height={24} alt="Explore" draggable="false" />
-                            <Link href='' className='text-white text-xl font-bold'>Explore</Link>
-                        </li>
-                        <li onClick={() => handleSelect(2)} className={`flex cursor-pointer items-center pl-5 h-[60px] gap-4 rounded-md ${selectedIndex === 2 ? "bg-[#ff4e2c]" : "bg-transparent"}`}>
-                            <Image src="/images/profilepic.svg" width={24} height={24} alt="Profile" draggable="false" />
-                            <Link href='' className='text-white text-xl font-bold'>Profile</Link>
-                        </li>
+                        <Link href=''>
+                            <li onClick={() => handleSelect(0)} className={`flex cursor-pointer items-center pl-5 h-[60px] gap-4 rounded-md ${selectedIndex === 0 ? "bg-[#ff4e2c] hover:bg-[#e94627]" : "bg-transparent hover:bg-white hover:bg-opacity-5"}`}>
+                                <Image src="/images/home.svg" width={24} height={24} alt="Home" draggable="false" />
+                                <span className='text-white text-xl font-bold'>Home</span>
+                            </li>
+                        </Link>
+                        <Link href=''>
+                            <li onClick={() => handleSelect(1)} className={`flex cursor-pointer items-center pl-5 h-[60px] gap-4 rounded-md ${selectedIndex === 1 ? "bg-[#ff4e2c] hover:bg-[#e94627]" : "bg-transparent hover:bg-white hover:bg-opacity-5"}`}>
+                                <Image src="/images/explore.svg" width={24} height={24} alt="Explore" draggable="false" />
+                                <span className='text-white text-xl font-bold'>Explore</span>
+                            </li>
+                        </Link>
+                        <Link href=''>
+                            <li onClick={() => handleSelect(2)} className={`flex cursor-pointer items-center pl-5 h-[60px] gap-4 rounded-md ${selectedIndex === 2 ? "bg-[#ff4e2c] hover:bg-[#e94627]" : "bg-transparent hover:bg-white hover:bg-opacity-5"}`}>
+                                <Image src="/images/profilepic.svg" width={24} height={24} alt="Profile" draggable="false" />
+                                <span className='text-white text-xl font-bold'>Profile</span>
+                            </li>
+                        </Link>
                     </ul>
                 </nav>
+
             </div>
             <div>
                 {isOpen ? (
@@ -52,10 +59,10 @@ const Sidebar = () => {
                 ) : (
                     <div className='w-full h-[1px] bg-[#717984]' />
                 )}
-                <div onClick={handleOpen} className='cursor-pointer flex items-center gap-8 justify-between mx-7 my-4 select-none'>
+                <div onClick={handleOpen} className='cursor-pointer flex items-center gap-8 justify-between px-7 py-4 select-none hover:bg-white hover:bg-opacity-5'>
                     <div className='flex items-center gap-3'>
                         <Image src="/images/ProfilePic.svg" width={55} height={55} alt="ProfilePic" className='rounded-full' draggable="false" />
-                        <p className='text-white text-xl font-bold text-center'>Username</p>
+                        <p className='text-white text-xl font-bold text-center '>Username</p>
                     </div>
                     <Image src="/images/arrow.svg" width={24} height={24} alt="Arrow" className={`transition-all ${isOpen ? "rotate-180" : ""}`} draggable="false" />
                 </div>
