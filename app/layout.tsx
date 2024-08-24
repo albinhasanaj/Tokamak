@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ReactNode } from "react";
+import { Component, ReactNode } from "react";
+import Sidebar from "@/components/Sidebar";
+import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from '@clerk/themes'
 
 export const metadata: Metadata = {
   title: "Tokamak",
@@ -9,11 +12,19 @@ export const metadata: Metadata = {
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <html lang="en">
-      <body className="bg-primary">
-        {children}
-      </body>
-    </html>
+    <ClerkProvider
+      appearance={{
+        baseTheme: dark,
+      }}
+    >
+
+      <html lang="en">
+        <body className="bg-primary flex">
+          <Sidebar />
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
 
