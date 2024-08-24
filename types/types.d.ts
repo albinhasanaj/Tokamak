@@ -1,4 +1,4 @@
-declare interface FeedProps {
+declare interface ImageProps {
     imgUrl: string;
     height: number;
     width: number;
