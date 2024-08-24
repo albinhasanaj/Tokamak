@@ -1,12 +1,13 @@
 "use client"
+import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut, SignInButton, SignOutButton } from '@clerk/nextjs'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 const Sidebar = () => {
-    const [selectedIndex, setSelectedIndex] = useState(0)
+    const [selectedIndex, setSelectedIndex] = useState<null | number>(null)
     const [isOpen, setIsOpen] = useState(false)
-    const [isLoggedIn, setIsLoggedIn] = useState(false) // Temporary, will be replaced with actual login state
 
     const handleSelect = (index: any) => {
         setSelectedIndex(index)
@@ -16,12 +17,25 @@ const Sidebar = () => {
         setIsOpen(!isOpen)
     }
 
-    const handleLogin = () => {
-        setIsLoggedIn(!isLoggedIn)
-    }
+    const pathname = usePathname()
+
+    useEffect(() => {
+        if (pathname === '/') {
+            setSelectedIndex(0)
+        }
+        else if (pathname === '/explore') {
+            setSelectedIndex(1)
+        }
+        else if (pathname === '/profile') {
+            setSelectedIndex(2)
+        }
+        else {
+            setSelectedIndex(null)
+        }
+    }, [pathname])
 
     return (
-        <div className='w-[300px] h-full bg-secondary flex flex-col pt-5 justify-between '>
+        <div className='w-[300px] h-screen bg-secondary flex flex-col pt-5 justify-between self-center rounded-md'>
             <div>
                 {/* <header className='text-[48px] text-white font-cursive text-center'>Tokamak</header> */}
                 <Image src="/images/logo.png" width={250} height={200} alt="Logo" className='mx-auto' draggable="false" />
@@ -41,27 +55,36 @@ const Sidebar = () => {
                             </li>
                         </Link>
 
-                        {isLoggedIn ? (
+
+                        <SignedIn >
                             <Link href=''>
                                 <li onClick={() => handleSelect(2)} className={`flex cursor-pointer items-center pl-5 h-[60px] gap-4 rounded-md ${selectedIndex === 2 ? "bg-[#ff4e2c] hover:bg-[#e94627]" : "bg-transparent hover:bg-white hover:bg-opacity-5"}`}>
                                     <Image src="/images/profilepic.svg" width={24} height={24} alt="Profile" draggable="false" />
                                     <span className='text-white text-xl font-bold'>Profile</span>
                                 </li>
                             </Link>
-                        ) : (
+                        </SignedIn>
+
+                        <SignedOut >
                             <div className='flex flex-col items-center gap-7 mt-[80px]'>
                                 <h1 className='text-center text-white text-2xl font-bold font-istok'>You are currently not logged in</h1>
                                 <div className='flex flex-col gap-4'>
-                                    <button onClick={handleLogin} className='w-[180px] h-[35px] rounded-full bg-[#465765] border-[#f1efff] border-[1px] text-white'>Log In</button>
-                                    <button className='w-[180px] h-[35px] rounded-full bg-[#081f31] text-white'>Create Account</button>
+                                    <a href="/signup">
+                                        <button className='w-[180px] h-[35px] rounded-full bg-[#465765] border-[#f1efff] border-[1px] text-white'>Log In</button>
+                                    </a>
+                                    <a href="/signup">
+                                        <button className='w-[180px] h-[35px] rounded-full bg-[#081f31] text-white'>Create Account</button>
+                                    </a>
                                 </div>
                             </div>
-                        )}
+                        </SignedOut>
+
                     </ul>
                 </nav>
 
             </div>
-            {isLoggedIn ? (
+
+            <SignedIn>
                 <div>
                     {isOpen ? (
                         <ul>
@@ -70,7 +93,9 @@ const Sidebar = () => {
                             </li>
                             <div className='w-full h-[1px] bg-[#d9d9d9] bg-opacity-50' />
                             <li>
-                                <button onClick={handleLogin} className='bg-[#717984] text-white w-full h-[50px] text-xl font-bold font-istok hover:bg-[#676f79] select-none'>Logout</button>
+                                <SignOutButton>
+                                    <button className='bg-[#717984] text-white w-full h-[50px] text-xl font-bold font-istok hover:bg-[#676f79] select-none'>Logout</button>
+                                </SignOutButton>
                             </li>
                         </ul>
                     ) : (
@@ -84,9 +109,8 @@ const Sidebar = () => {
                         <Image src="/images/arrow.svg" width={24} height={24} alt="Arrow" className={`transition-all ${isOpen ? "rotate-180" : ""}`} draggable="false" />
                     </div>
                 </div>
-            ) : (
-                ""
-            )}
+            </SignedIn>
+
         </div>
     )
 }
