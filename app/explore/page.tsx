@@ -1,6 +1,7 @@
 "use client";
 import React, { Fragment, useEffect, useState } from 'react';
 import Image from 'next/image';
+import { MoonLoader } from 'react-spinners';
 
 // Correct interface definition based on Python script output
 interface ImageProps {
@@ -11,7 +12,8 @@ interface ImageProps {
 
 const Explore = () => {
     const [images, setImages] = useState<ImageProps[]>([]); // Updated initial state type
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [refresh, setRefresh] = useState<boolean>(false);
 
     useEffect(() => {
         // Fetch data from the API
@@ -24,6 +26,7 @@ const Explore = () => {
                     console.log(data)
                     setImages(data); // Directly set images if API returns an array of objects
                     setLoading(false);
+
                 } else {
                     throw new Error("Network response was not ok");
                 }
@@ -35,14 +38,29 @@ const Explore = () => {
         };
 
         fetchData();
-    }, []);
+    }, [refresh]);
 
+    const handleRefresh = () => {
+        setLoading(true);
+        setRefresh(!refresh);
+    }
 
     return (
-        <main className='w-full flex justify-center'>
+        <main className='w-full flex flex-col items-center'>
+            {/* Refetch Button */}
+            <button
+                onClick={handleRefresh}
+                className="px-6 py-3 mb-6 text-white bg-blue-500 rounded-lg hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-300"
+            >
+                Refetch Images
+            </button>
+
+            {/* Images Grid */}
             <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4">
                 {loading ? (
-                    <p>Loading...</p>
+                    <div className="flex justify-center items-center h-screen w-full">
+                        <MoonLoader color="#fff" loading={loading} size={100} />
+                    </div>
                 ) : (
                     <Fragment>
                         {images.length > 0 && (  // Check if images array has content
@@ -53,7 +71,7 @@ const Explore = () => {
                                             src={image.image}  // Correct property name for src
                                             width={image.width}  // Correct property name for width
                                             height={image.height}  // Correct property name for height
-                                            className="rounded-lg  w-[300px] h-auto"
+                                            className="rounded-lg w-[300px] h-auto"
                                             alt={`Random image ${index}`} // Unique alt text for accessibility
                                         />
                                     </div>
@@ -67,4 +85,4 @@ const Explore = () => {
     )
 }
 
-export default Explore
+export default Explore;
