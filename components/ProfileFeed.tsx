@@ -1,12 +1,21 @@
-"use client"
-import Image from 'next/image'
-import React from 'react'
-import ProfilePosts, { Post } from "./ProfileFeedContainer"
-import { useSearchParams, usePathname } from 'next/navigation'
-import Link from 'next/link'
-import { Input } from 'postcss'
+"use client";
+import Image from 'next/image';
+import React, { Fragment, useEffect, useState } from 'react';
+import ProfilePosts, { Post } from "./ProfileFeedContainer";
+import { useSearchParams, usePathname } from 'next/navigation';
+import Link from 'next/link';
+import toast from 'react-hot-toast';
+
+interface ImageProps {
+    image: string; // Matches the key from the Python script output
+    width: number;
+    height: number;
+}
 
 const ProfileFeed: React.FC = () => {
+    const [images, setImages] = useState<ImageProps[]>([]); // Updated initial state type
+    const [loading, setLoading] = useState<boolean>(true);
+    const [refresh, setRefresh] = useState<boolean>(false);
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const [scaleImage, setScaleImage] = React.useState(false);
@@ -23,6 +32,26 @@ const ProfileFeed: React.FC = () => {
         setScaleImage(!scaleImage);
     };
 
+    const fetchData = async (path: string) => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/${path}`); // Direct request to Python server
+            if (res.ok) {
+                const data = await res.json();
+                setImages(data);
+                setLoading(false);
+            } else {
+                throw new Error("Network response was not ok");
+            }
+        } catch (error) {
+            setLoading(true);
+            console.error("There was an error!", error);
+            toast.error("There was an error fetching images. Please try again later.");
+        }
+    };
+
+    useEffect(() => {
+        fetchData('images/serveAll');
+    }, []);
 
     return (
         <div className="relative min-h-screen text-white">
@@ -37,12 +66,15 @@ const ProfileFeed: React.FC = () => {
                             <div
                                 className={`bg-gray-700 w-64 h-64 rounded-md relative cursor-pointer overflow-hidden transition-transform duration-300 ${selectedPost?.id === post.id ? 'scale-110' : 'hover:scale-105'}`}
                             >
-                                <Image
-                                    src={post.image}
-                                    alt={post.title}
-                                    className="object-cover w-full h-full absolute inset-0"
-                                    layout="fill"
-                                />
+                                {images.length > 0 && images[post.id - 1] && (  // Adjust this to map the correct image to the post
+                                    <Image
+                                        src={images[post.id - 1].image}  // Display the corresponding image for the post
+                                        width={images[post.id - 1].width}
+                                        height={images[post.id - 1].height}
+                                        className="object-cover w-full h-full absolute inset-0"
+                                        alt={`Image for post ${post.title}`}
+                                    />
+                                )}
                                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                                     <h1 className="text-xl font-bold text-center">{post.title}</h1>
                                 </div>
@@ -59,7 +91,7 @@ const ProfileFeed: React.FC = () => {
             {/* Overlay for the selected post */}
             {selectedPost && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-20">
-                    <div className={`relative bg-gray-700 w-[90vw] h-[90vh] max-w-screen-lg max-h-screen rounded-lg overflow-hidden transition-transform duration-500 $`}>
+                    <div className={`relative bg-gray-700 w-[90vw] h-[90vh] max-w-screen-lg max-h-screen rounded-lg overflow-hidden transition-transform duration-500`}>
                         <Link href={pathname} passHref>
                             <button
                                 className="absolute top-4 right-4 bg-black bg-opacity-70 text-white rounded-full p-2 hover:bg-opacity-100 transition-opacity"
@@ -74,15 +106,16 @@ const ProfileFeed: React.FC = () => {
                                     <h1 className={`text-3xl font-bold absolute top-[1%] transition-opacity duration-300 ${scaleImage ? 'opacity-0' : 'opacity-100'}`}>
                                         {selectedPost.title}
                                     </h1>
-                                    <Image
-                                        src={selectedPost.image}
-                                        alt={selectedPost.title}
-                                        className={`object-contain select-none max-h-full max-w-full cursor-pointer transition-all duration-[350ms] z-40 ${scaleImage ? 'transform scale-150 translate-x-[50%] translate-y-[0%] left-1/2 top-1/2' : 'hover:scale-[1.02]'}`}
-                                        layout="intrinsic"
-                                        width={450}
-                                        height={450}
-                                        onClick={handleScaleImage}
-                                    />
+                                    {images.length > 0 && images[selectedPost.id - 1] && (  // Only show the image corresponding to the selected post
+                                        <Image
+                                            src={images[selectedPost.id - 1].image}  // Show the image for the selected post
+                                            width={images[selectedPost.id - 1].width}
+                                            height={images[selectedPost.id - 1].height}
+                                            className={`object-contain select-none max-h-[85%] max-w-full w-[450px] cursor-pointer transition-all duration-[350ms] z-40 ${scaleImage ? 'transform scale-125 translate-x-[50%] translate-y-[0%] left-1/2 top-1/2' : 'hover:scale-[1.02]'}`}
+                                            alt={`Image for post ${selectedPost.title}`}
+                                            onClick={handleScaleImage}
+                                        />
+                                    )}
                                 </div>
                                 <div className={`flex flex-col max-w-[400px] w-full justify-center gap-20 h-full transition-opacity duration-300 ${scaleImage ? 'opacity-25 pointer-events-none' : 'opacity-100'}`}>
                                     {/* Comment Section */}
@@ -107,17 +140,18 @@ const ProfileFeed: React.FC = () => {
                                     </div>
 
                                     <div className='flex flex-col items-center gap-4'>
-                                        <textarea placeholder='Update description...' name="comment" id="comment" className='text-white w-full h-[100px] rounded-md bg-[#4B5766] border-[2px] border-[rgba(255,255,255,0.5)] focus:border-[rgba(255,255,255,1)] outline-none font-istok p-2'></textarea>
-                                        <button className='bg-[#4B5766] text-white px-5 py-2 rounded-md hover:bg-[#3D4652] transition-colors border-[2px] border-[#2e363f] w-[100px]'>Update</button>
+                                        <textarea placeholder='Update description...' name="comment" id="comment" cols={20} rows={6} className='text-white w-full bg-[#38424d] border-[2px] border-[#4B5766] focus:border-[rgba(255,255,255,1)] outline-none font-istok p-2 rounded-md resize-none'></textarea>
+                                        <button className='bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-5 py-2 rounded-md shadow-md transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-cyan-300'>Save Changes</button>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
             )}
         </div>
     );
-}
+};
 
 export default ProfileFeed;
