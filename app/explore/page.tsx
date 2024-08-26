@@ -2,6 +2,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { MoonLoader } from 'react-spinners';
+import toast from 'react-hot-toast';
 
 // Correct interface definition based on Python script output
 interface ImageProps {
@@ -15,34 +16,36 @@ const Explore = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [refresh, setRefresh] = useState<boolean>(false);
 
-    useEffect(() => {
-        // Fetch data from the API
-        const fetchData = async () => {
-            try {
-                const res = await fetch("http://localhost:5000/api/images"); // Direct request to Python server
-                if (res.ok) {
-                    const data = await res.json(); // Assuming the API returns an array of images
+    const fetchData = async (path: string) => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/${path}`); // Direct request to Python server
+            if (res.ok) {
+                const data = await res.json();
 
-                    console.log(data)
-                    setImages(data); // Directly set images if API returns an array of objects
-                    setLoading(false);
+                console.log(data)
+                setImages(data);
+                setLoading(false);
 
-                } else {
-                    throw new Error("Network response was not ok");
-                }
-
-            } catch (error) {
-                setLoading(true);
-                console.error("There was an error!", error);
+            } else {
+                throw new Error("Network response was not ok");
             }
-        };
 
-        fetchData();
-    }, [refresh]);
+        } catch (error) {
+            setLoading(true);
+            console.error("There was an error!", error);
+            toast.error("There was an error fetching images. Please try again later.");
+        }
+
+    }
+
+    useEffect(() => {
+        fetchData('images/serveAll');
+    }, []);
+
 
     const handleRefresh = () => {
         setLoading(true);
-        setRefresh(!refresh);
+        fetchData('images');
     }
 
     return (
