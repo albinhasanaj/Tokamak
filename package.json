@@ -11,9 +11,11 @@
   "dependencies": {
     "@clerk/nextjs": "^5.3.3",
     "@clerk/themes": "^2.1.21",
+    "@tanstack/react-query": "^5.52.1",
     "next": "14.2.6",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-spinners": "^0.14.1"
   },
   "devDependencies": {
     "@types/node": "^20",

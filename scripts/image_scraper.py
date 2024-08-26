@@ -12,14 +12,18 @@ from PIL import Image
 import random
 import time
 import os
+import pathlib
 
 app = Flask(__name__)
 CORS(app) # allow cors for all routes
 
 # Load the model
-CNN_MODEL = tf.keras.models.load_model("scripts/cool_model.keras", compile=False)
+PATH = str(pathlib.Path(__file__).parent.resolve()) + "/cool_model.keras"
+print(PATH)
 
-TOTAL_IMAGES = 5
+CNN_MODEL = tf.keras.models.load_model(PATH)
+
+TOTAL_IMAGES = 20
 url = "https://prnt.sc/"
 
 # Set up Chrome options
@@ -46,8 +50,11 @@ os.makedirs(IMAGE_DIR, exist_ok=True)
 
 @app.route('/api/images', methods=['GET'])
 def get_images():
+    delete_images()
     images = find_image_url()
+    print("Returning images:", images)
     return jsonify(images)
+
 
 @app.route('/image/<filename>', methods=['GET'])
 def serve_image(filename):
@@ -55,7 +62,7 @@ def serve_image(filename):
     print("Script directory:", SCRIPT_DIR)
     print("Project root directory:", PROJECT_ROOT)
     print("Image directory being used:", IMAGE_DIR)
-    
+
     image_path = os.path.join(IMAGE_DIR, filename)
     print(f"Attempting to serve file from: {image_path}")
 
@@ -65,16 +72,23 @@ def serve_image(filename):
 
     return send_file(image_path, mimetype='image/png')
 
-
+def delete_images():
+    for file in os.listdir(IMAGE_DIR):
+        os.remove(os.path.join(IMAGE_DIR, file))
 
 def generate_url():
     return url + ''.join(random.choices('abcdefghijklmnopqrstuvwxyz0123456789', k=6))
 
 def find_image_url():
     images = []
+    all_images = set()
     while len(images) < TOTAL_IMAGES:
         image_url = generate_url()
         print("Checking", image_url)
+
+        if image_url in all_images:
+            continue
+
         driver.get(image_url)
         
         try:
@@ -84,6 +98,7 @@ def find_image_url():
             )
         except:
             print("No div found, skipping this URL")
+            all_images.add(image_url)
             continue  # Skip to the next iteration if the div is not found
 
         try:
@@ -91,7 +106,6 @@ def find_image_url():
             div = driver.find_element(By.CLASS_NAME, 'under-image')
             image_element = div.find_element(By.TAG_NAME, 'img')
             image_src = image_element.get_attribute('src')
-            print("Length of source:", len(image_src))
 
             if image_src:
                 # Take a snapshot of the image and show it using matplotlib
@@ -116,22 +130,27 @@ def find_image_url():
                     }
 
                     images.append(full_image)
-                    print("\033[92m" + "Image added to list" + "\033[0m")
+                    print("\033[92m" + f"Image added to list {len(images)}/{TOTAL_IMAGES}" + "\033[0m")
                 else:
                     print("\033[93m" + "Image not added to list" + "\033[0m")
 
+            all_images.add(image_url)
         except Exception as e:
+            if "stale element reference" in str(e):
+                print("\033[93m" + "Stale element reference, retrying..." + "\033[0m")
+                continue  # Skip and retry fetching another URL
             print("\033[91m" + f"An error occurred: {str(e)}" + "\033[0m")
 
-              # Sleep between 0.5 and 1.5 seconds
-        time.sleep(random.uniform(0.5, 1.5))
+
+              # Sleep between 0.5 and 1 seconds
+        time.sleep(random.uniform(0.5, 1))
 
     return images
 
 if __name__ == '__main__':
     try:
         print("Starting Python server...")
-        app.run(host='0.0.0.0', port=5000)
+        app.run(host='0.0.0.0', port=5000, threaded=False)
     except KeyboardInterrupt:
         print("Shutting down gracefully...")
     finally:
