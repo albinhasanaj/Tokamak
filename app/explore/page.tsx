@@ -15,6 +15,7 @@ const Explore = () => {
     const [images, setImages] = useState<ImageProps[]>([]); // Updated initial state type
     const [loading, setLoading] = useState<boolean>(true);
     const [refresh, setRefresh] = useState<boolean>(false);
+    const [sliderValue, setSliderValue] = useState<number>(1);
 
     const fetchData = async (path: string) => {
         try {
@@ -45,12 +46,24 @@ const Explore = () => {
 
     const handleRefresh = () => {
         setLoading(true);
-        fetchData('images');
+        fetchData(`images/${sliderValue}`);
     }
 
     return (
         <main className='w-full flex flex-col items-center'>
             {/* Refetch Button */}
+            {/* add slider from 1-25 */}
+            <div className='flex gap-4 text-white w-full justify-center mt-6'>
+                <input
+                    type="range"
+                    min="1"
+                    max="25"
+                    value={sliderValue}
+                    className="w-1/4"
+                    onChange={(e) => setSliderValue(Number(e.target.value))}
+                />
+                <span>{sliderValue}</span>
+            </div>
             <button
                 onClick={handleRefresh}
                 className="px-6 py-3 mb-6 text-white bg-blue-500 rounded-lg hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-300"
