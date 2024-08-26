@@ -4,6 +4,7 @@ import React from 'react'
 import ProfilePosts, { Post } from "./ProfileFeedContainer"
 import { useSearchParams, usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { Input } from 'postcss'
 
 const ProfileFeed: React.FC = () => {
     const searchParams = useSearchParams();
@@ -83,21 +84,30 @@ const ProfileFeed: React.FC = () => {
                                         onClick={handleScaleImage}
                                     />
                                 </div>
-                                <div className={`flex flex-col gap-4 max-w-[400px] w-full justify-between h-full transition-opacity duration-300 ${scaleImage ? 'opacity-25 pointer-events-none' : 'opacity-100'}`}>
+                                <div className={`flex flex-col max-w-[400px] w-full justify-center gap-20 h-full transition-opacity duration-300 ${scaleImage ? 'opacity-25 pointer-events-none' : 'opacity-100'}`}>
                                     {/* Comment Section */}
-                                    <div className='flex flex-col gap-3 overflow-y-auto h-[550px] bg-[#2e363f] p-4 rounded-md border-[2px] border-[#4B5766] mt-10'>
-                                        <div className='flex flex-col gap-3'>
-                                            <p className='text-sm'><span className='font-bold text-cyan-400'>User1:</span> This is a comment on the post.</p>
-                                            <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Another comment here!</p>
-                                            <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Magni culpa possimus ipsa eligendi vero fuga architecto quos, commodi officia velit ipsum, perferendis id impedit exercitationem sint excepturi distinctio maxime! Suscipit!</p>
-                                            <p className='text-sm'><span className='font-bold text-cyan-400'>User1:</span> This is a comment on the post.</p>
-                                            <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Another comment here!</p>
-                                            <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Magni culpa possimus ipsa eligendi vero fuga architecto quos, commodi officia velit ipsum, perferendis id impedit exercitationem sint excepturi distinctio maxime! Suscipit!</p>
-                                            <p className='text-sm'><span className='font-bold text-cyan-400'>User1:</span> This song is SOOO GOOOD WTF!!???!?!</p>
+                                    <div>
+                                        <div className='flex flex-col overflow-y-auto h-[500px] rounded-t-md border-[2px] border-b-0 border-[#4B5766] justify-between bg-[#2e363f]'>
+                                            <div className='flex flex-col gap-3 bg-[#2e363f] p-4'>
+                                                <p className='text-sm'><span className='font-bold text-cyan-400'>User1:</span> This is a comment on the post.</p>
+                                                <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Another comment here!</p>
+                                                <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Magni culpa possimus ipsa eligendi vero fuga architecto quos, commodi officia velit ipsum, perferendis id impedit exercitationem sint excepturi distinctio maxime! Suscipit!</p>
+                                                <p className='text-sm'><span className='font-bold text-cyan-400'>User1:</span> This is a comment on the post.</p>
+                                                <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Another comment here!</p>
+                                                <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Magni culpa possimus ipsa eligendi vero fuga architecto quos, commodi officia velit ipsum, perferendis id impedit exercitationem sint excepturi distinctio maxime! Suscipit!</p>
+                                                <p className='text-sm'><span className='font-bold text-cyan-400'>User1:</span> This song is SOOO GOOOD WTF!!???!?!</p>
+                                                <p className='text-sm'><span className='font-bold text-cyan-400'>User1:</span> This song is SOOO GOOOD WTF!!???!?!</p>
+                                                <p className='text-sm'><span className='font-bold text-cyan-400'>User1:</span> This song is SOOO GOOOD WTF!!???!?!</p>
+                                            </div>
+                                        </div>
+                                        <div className='flex relative'>
+                                            <input type="text" placeholder='Comment...' className='text-white w-full rounded-b-lg bg-[#38424d] border-[2px] border-[#4B5766] focus:border-[rgba(255,255,255,1)] outline-none font-istok p-2 pr-[80px]' />
+                                            <button className='absolute h-[45px] right-[0] p-3 bottom-0 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold shadow-md transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-cyan-300'>Submit</button>
                                         </div>
                                     </div>
+
                                     <div className='flex flex-col items-center gap-4'>
-                                        <textarea placeholder='Add a comment...' name="comment" id="comment" className='text-white w-full h-[100px] rounded-md bg-[#4B5766] border-[2px] border-[rgba(255,255,255,0.5)] focus:border-[rgba(255,255,255,1)] outline-none font-istok p-2'></textarea>
+                                        <textarea placeholder='Update description...' name="comment" id="comment" className='text-white w-full h-[100px] rounded-md bg-[#4B5766] border-[2px] border-[rgba(255,255,255,0.5)] focus:border-[rgba(255,255,255,1)] outline-none font-istok p-2'></textarea>
                                         <button className='bg-[#4B5766] text-white px-5 py-2 rounded-md hover:bg-[#3D4652] transition-colors border-[2px] border-[#2e363f] w-[100px]'>Update</button>
                                     </div>
                                 </div>
