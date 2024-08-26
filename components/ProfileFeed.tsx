@@ -37,8 +37,17 @@ const ProfileFeed: React.FC = () => {
             const res = await fetch(`http://localhost:5000/api/${path}`); // Direct request to Python server
             if (res.ok) {
                 const data = await res.json();
-                setImages(data);
+                const arrData = data.map((item: any, index: number) => {
+                    return {
+                        id: index + 1,
+                        title: "Post " + (index + 1),
+                        image: item.image,
+                        width: item.width,
+                        height: item.height,
+                    };
+                });
                 setLoading(false);
+                setImages(arrData);
             } else {
                 throw new Error("Network response was not ok");
             }
@@ -51,12 +60,13 @@ const ProfileFeed: React.FC = () => {
 
     useEffect(() => {
         fetchData('images/serveAll');
+
     }, []);
 
     return (
         <div className="relative min-h-screen text-white">
             <div className={`flex flex-wrap gap-5 mt-20 justify-center px-5 ${selectedPost ? 'pointer-events-none blur-sm' : ''}`}>
-                {ProfilePosts.map((post: Post) => (
+                {images.map((post: Post) => (
                     <div key={post.id} className="flex flex-col items-center gap-2">
                         <Link
                             href={`${pathname}?post=${post.id}&post_title=${encodeURIComponent(post.title.replace(/ /g, '_'))}`}
