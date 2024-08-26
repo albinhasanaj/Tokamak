@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, send_file, abort
 from flask_cors import CORS  # Import CORS
-import json
 import tensorflow as tf
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -13,17 +12,17 @@ import random
 import time
 import os
 import pathlib
+import pandas as pd
 
 app = Flask(__name__)
 CORS(app) # allow cors for all routes
 
 # Load the model
 PATH = str(pathlib.Path(__file__).parent.resolve()) + "/cool_model.keras"
-print(PATH)
 
 CNN_MODEL = tf.keras.models.load_model(PATH)
 
-TOTAL_IMAGES = 20
+TOTAL_IMAGES = 3
 url = "https://prnt.sc/"
 
 # Set up Chrome options
@@ -50,11 +49,16 @@ os.makedirs(IMAGE_DIR, exist_ok=True)
 
 @app.route('/api/images', methods=['GET'])
 def get_images():
-    delete_images()
+    # delete_images()
     images = find_image_url()
     print("Returning images:", images)
     return jsonify(images)
 
+
+@app.route('/api/images/serveAll', methods=['GET'])
+def serve_all_images():
+    images = check_image_csv()
+    return jsonify(images)
 
 @app.route('/image/<filename>', methods=['GET'])
 def serve_image(filename):
@@ -79,10 +83,18 @@ def delete_images():
 def generate_url():
     return url + ''.join(random.choices('abcdefghijklmnopqrstuvwxyz0123456789', k=6))
 
+def check_image_csv():
+    # check if the csv file exists and return the images in the same format as a list of dictionaries
+    if os.path.exists(os.path.join(SCRIPT_DIR, "images.csv")):
+        df = pd.read_csv(os.path.join(SCRIPT_DIR, "images.csv"))
+        return df.to_dict('records')
+    return []
+
 def find_image_url():
-    images = []
+    images = check_image_csv()
+    num_images = 0
     all_images = set()
-    while len(images) < TOTAL_IMAGES:
+    while num_images < TOTAL_IMAGES:
         image_url = generate_url()
         print("Checking", image_url)
 
@@ -130,7 +142,8 @@ def find_image_url():
                     }
 
                     images.append(full_image)
-                    print("\033[92m" + f"Image added to list {len(images)}/{TOTAL_IMAGES}" + "\033[0m")
+                    num_images += 1
+                    print("\033[92m" + f"Image added to list {num_images}/{TOTAL_IMAGES}" + "\033[0m")
                 else:
                     print("\033[93m" + "Image not added to list" + "\033[0m")
 
@@ -145,6 +158,9 @@ def find_image_url():
               # Sleep between 0.5 and 1 seconds
         time.sleep(random.uniform(0.5, 1))
 
+    # save all the images to a csv file
+    df = pd.DataFrame(images)
+    df.to_csv(os.path.join(SCRIPT_DIR, "images.csv"), index=False)
     return images
 
 if __name__ == '__main__':
