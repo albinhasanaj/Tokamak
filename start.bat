@@ -3,6 +3,10 @@
 REM Navigate to the root folder
 cd /d %~dp0
 
+REM Check and install necessary Python packages
+echo Checking and installing necessary Python packages...
+python "scripts\check_requirements.py"
+
 REM Run the Python script in a new Command Prompt window
 echo Starting Python server in a new window...
 start cmd /k "python scripts\image_scraper.py"
