@@ -2,13 +2,15 @@
 import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut, SignInButton, SignOutButton } from '@clerk/nextjs'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
+import React, { useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 const Sidebar = () => {
     const [selectedIndex, setSelectedIndex] = useState<null | number>(null)
     const [isOpen, setIsOpen] = useState(false)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+    const profileRef = useRef<HTMLDivElement>(null)
+    const mobileMenuRef = useRef<HTMLDivElement>(null)
 
     const handleSelect = (index: any) => {
         setSelectedIndex(index)
@@ -17,6 +19,10 @@ const Sidebar = () => {
 
     const handleOpen = () => {
         setIsOpen(!isOpen)
+    }
+
+    const handleClose = () => {
+        setIsOpen(false)
     }
 
     const handleMobileMenuToggle = () => {
@@ -40,12 +46,31 @@ const Sidebar = () => {
         }
     }, [pathname])
 
+    // Handle clicks outside the profile div
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                profileRef.current && !profileRef.current.contains(event.target as Node) &&
+                mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)
+            ) {
+                setIsOpen(false)
+                setIsMobileMenuOpen(false)
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside)
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [])
+
     return (
         <div>
             {/* Desktop Sidebar */}
-            <div className='hidden w-[300px] md:block'>
-                <div className='hidden w-[300px] h-screen bg-secondary md:flex flex-col pt-5 justify-between self-center rounded-md fixed'>
-                    <div>
+            <div className='hidden w-[300px] md:block p-5 h-screen'>
+                <div className='w-[300px] h-[95%] bg-secondary md:flex flex-col pt-5 justify-between self-center rounded-md fixed z-[9999]'>
+                    <div onClick={handleClose}>
                         <Image src="/images/logo.png" width={250} height={200} alt="Logo" className='mx-auto' draggable="false" />
                         <nav className='py-5'>
                             <p className="text-white text-xl font-bold font-istok pl-5 pb-4 pt-7 select-none">Menu</p>
@@ -62,7 +87,6 @@ const Sidebar = () => {
                                         <span className='text-white text-xl font-bold'>Explore</span>
                                     </li>
                                 </Link>
-
 
                                 <SignedIn >
                                     <Link href='/profile'>
@@ -86,14 +110,12 @@ const Sidebar = () => {
                                         </div>
                                     </div>
                                 </SignedOut>
-
                             </ul>
                         </nav>
-
                     </div>
 
                     <SignedIn>
-                        <div>
+                        <div ref={profileRef}>
                             {isOpen ? (
                                 <ul>
                                     <li>
@@ -118,24 +140,19 @@ const Sidebar = () => {
                             </div>
                         </div>
                     </SignedIn>
-
                 </div>
             </div>
 
-
-
-
             {/* Mobile Hamburger Menu */}
-            <div className='flex md:hidden  fixed'>
+            <div className='flex md:hidden fixed z-[9999]' ref={mobileMenuRef}>
                 <div
                     className={`bg-secondary rounded-br-xl transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'w-[300px] h-screen' : 'w-[50px] h-[50px]'}`}
                     style={{ overflow: 'hidden' }}
                 >
                     {isMobileMenuOpen ? (
                         <div className='bg-secondary flex flex-col h-full justify-between '>
-                            <div>
+                            <div onClick={handleClose}>
                                 <Image src="/images/cross.svg" width={48} height={48} alt="Hamburger Menu" draggable="false" onClick={handleMobileMenuToggle} />
-
                                 <div className='pt-5'>
                                     <nav className='py-5'>
                                         <p className="text-white text-xl font-bold font-istok pl-5 pb-4 pt-7 select-none">Menu</p>
@@ -166,7 +183,7 @@ const Sidebar = () => {
                             </div>
                             <div className='pb-5'>
                                 <SignedIn>
-                                    <div>
+                                    <div ref={profileRef}>
                                         {isOpen ? (
                                             <ul>
                                                 <li>

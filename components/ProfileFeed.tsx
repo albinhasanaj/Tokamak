@@ -1,40 +1,53 @@
 "use client"
 import Image from 'next/image'
-import React, { useState } from 'react'
+import React from 'react'
 import ProfilePosts, { Post } from "./ProfileFeedContainer"
+import { useSearchParams, usePathname } from 'next/navigation'
+import Link from 'next/link'
 
 const ProfileFeed: React.FC = () => {
-    const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const [scaleImage, setScaleImage] = React.useState(false);
 
-    const handleSelectPost = (post: Post) => {
-        setSelectedPost(post);
-    }
+    // Parse post ID and title from the query parameters
+    const selectedPostId = searchParams.get('post');
+    const selectedPostTitle = searchParams.get('post_title')?.replace(/_/g, ' ');
 
-    const handleDeselectPost = () => {
-        setSelectedPost(null);
-    }
+    const selectedPost = ProfilePosts.find(
+        (post: Post) => post.id === Number(selectedPostId) && post.title === selectedPostTitle
+    ) || null;
+
+    const handleScaleImage = () => {
+        setScaleImage(!scaleImage);
+    };
+
 
     return (
-        <div>
-            {/* <Image
-                src='/images/giraffe.jpg'
-                alt='Profile Feed'
-                className='rounded-md'
-                width={270}
-                height={0}
-            /> */}
-            <div className={`flex gap-5 flex-wrap mt-20 items-start mx-5 justify-center ${selectedPost ? 'pointer-events-none blur' : ''}`}>
+        <div className="relative min-h-screen text-white">
+            <div className={`flex flex-wrap gap-5 mt-20 justify-center px-5 ${selectedPost ? 'pointer-events-none blur-sm' : ''}`}>
                 {ProfilePosts.map((post: Post) => (
-                    <div key={post.id}>
-                        <div
-                            className={`bg-[#7a7a7a] w-[250px] h-[150px] rounded-md flex flex-col justify-center gap-5 cursor-pointer ${selectedPost?.id === post.id ? 'scale-110 z-10' : ''
-                                }`}
-                            onClick={() => handleSelectPost(post)}
+                    <div key={post.id} className="flex flex-col items-center gap-2">
+                        <Link
+                            href={`${pathname}?post=${post.id}&post_title=${encodeURIComponent(post.title.replace(/ /g, '_'))}`}
+                            as={`${pathname}?post=${post.id}&post_title=${encodeURIComponent(post.title.replace(/ /g, '_'))}`}
+                            title={post.title}
                         >
-                            <h1 className='text-black font-bold text-center'>{post.title}</h1>
-                            <p className='text-black font-bold text-center'>{post.content}</p>
-                        </div>
-                        <div className='text-white flex gap-5 justify-end mb-12'>
+                            <div
+                                className={`bg-gray-700 w-64 h-64 rounded-md relative cursor-pointer overflow-hidden transition-transform duration-300 ${selectedPost?.id === post.id ? 'scale-110' : 'hover:scale-105'}`}
+                            >
+                                <Image
+                                    src={post.image}
+                                    alt={post.title}
+                                    className="object-cover w-full h-full absolute inset-0"
+                                    layout="fill"
+                                />
+                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                    <h1 className="text-xl font-bold text-center">{post.title}</h1>
+                                </div>
+                            </div>
+                        </Link>
+                        <div className="flex gap-5 text-sm">
                             <p>Likes</p>
                             <p>Comments</p>
                         </div>
@@ -42,22 +55,50 @@ const ProfileFeed: React.FC = () => {
                 ))}
             </div>
 
-            {/* If a post is selected, show the overlay */}
+            {/* Overlay for the selected post */}
             {selectedPost && (
-                <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-20'>
-                    <div className='relative bg-[#7a7a7a] w-[90vw] h-[90vh] max-w-screen-lg max-h-screen rounded-md'>
-                        <div className='absolute inset-0 flex items-center justify-center'>
-                            <Image src='/images/cross.svg' alt='Profile Feed' className='rounded-full bg-black absolute bottom-[93%] left-[94%] cursor-pointer' onClick={handleDeselectPost} width={40} height={0} />
-                            <div className='bg-[#7a7a7a] p-5 rounded-md w-full h-full flex items-center justify-center'>
-                                <div className='flex flex-col items-center justify-center h-full w-full'>
-                                    <h1 className='text-black font-bold text-center mb-4'>{selectedPost.title}</h1>
-                                    <p className='text-black font-bold text-center mb-4'>{selectedPost.content}</p>
-                                    {/* Display the content of the selected post here */}
-                                    <div className='w-full h-full flex items-center justify-center'>
-                                        {/* Adjust this div to center content */}
-                                        <div className='w-full h-full flex items-center justify-center'>
-                                            <p className='text-black'>{selectedPost.content}</p>
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-20">
+                    <div className={`relative bg-gray-700 w-[90vw] h-[90vh] max-w-screen-lg max-h-screen rounded-lg overflow-hidden transition-transform duration-500 $`}>
+                        <Link href={pathname} passHref>
+                            <button
+                                className="absolute top-4 right-4 bg-black bg-opacity-70 text-white rounded-full p-2 hover:bg-opacity-100 transition-opacity"
+                                aria-label="Close"
+                            >
+                                <Image src='/images/cross.svg' alt='Close' width={24} height={24} />
+                            </button>
+                        </Link>
+                        <div className="flex items-center justify-center h-full p-5 flex-col gap-10">
+                            <div className='flex justify-center w-full h-full gap-10'>
+                                <div className={`flex flex-col items-center gap-3 justify-center relative ${scaleImage ? 'z-50' : ''}`}>
+                                    <h1 className={`text-3xl font-bold absolute top-[1%] transition-opacity duration-300 ${scaleImage ? 'opacity-0' : 'opacity-100'}`}>
+                                        {selectedPost.title}
+                                    </h1>
+                                    <Image
+                                        src={selectedPost.image}
+                                        alt={selectedPost.title}
+                                        className={`object-contain select-none max-h-full max-w-full cursor-pointer transition-all duration-[350ms] z-40 ${scaleImage ? 'transform scale-150 translate-x-[50%] translate-y-[0%] left-1/2 top-1/2' : 'hover:scale-[1.02]'}`}
+                                        layout="intrinsic"
+                                        width={450}
+                                        height={450}
+                                        onClick={handleScaleImage}
+                                    />
+                                </div>
+                                <div className={`flex flex-col gap-4 max-w-[400px] w-full justify-between h-full transition-opacity duration-300 ${scaleImage ? 'opacity-25 pointer-events-none' : 'opacity-100'}`}>
+                                    {/* Comment Section */}
+                                    <div className='flex flex-col gap-3 overflow-y-auto h-[550px] bg-[#2e363f] p-4 rounded-md border-[2px] border-[#4B5766] mt-10'>
+                                        <div className='flex flex-col gap-3'>
+                                            <p className='text-sm'><span className='font-bold text-cyan-400'>User1:</span> This is a comment on the post.</p>
+                                            <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Another comment here!</p>
+                                            <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Magni culpa possimus ipsa eligendi vero fuga architecto quos, commodi officia velit ipsum, perferendis id impedit exercitationem sint excepturi distinctio maxime! Suscipit!</p>
+                                            <p className='text-sm'><span className='font-bold text-cyan-400'>User1:</span> This is a comment on the post.</p>
+                                            <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Another comment here!</p>
+                                            <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Magni culpa possimus ipsa eligendi vero fuga architecto quos, commodi officia velit ipsum, perferendis id impedit exercitationem sint excepturi distinctio maxime! Suscipit!</p>
+                                            <p className='text-sm'><span className='font-bold text-cyan-400'>User1:</span> This song is SOOO GOOOD WTF!!???!?!</p>
                                         </div>
+                                    </div>
+                                    <div className='flex flex-col items-center gap-4'>
+                                        <textarea placeholder='Add a comment...' name="comment" id="comment" className='text-white w-full h-[100px] rounded-md bg-[#4B5766] border-[2px] border-[rgba(255,255,255,0.5)] focus:border-[rgba(255,255,255,1)] outline-none font-istok p-2'></textarea>
+                                        <button className='bg-[#4B5766] text-white px-5 py-2 rounded-md hover:bg-[#3D4652] transition-colors border-[2px] border-[#2e363f] w-[100px]'>Update</button>
                                     </div>
                                 </div>
                             </div>
@@ -66,7 +107,7 @@ const ProfileFeed: React.FC = () => {
                 </div>
             )}
         </div>
-    )
+    );
 }
 
-export default ProfileFeed
+export default ProfileFeed;
