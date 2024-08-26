@@ -22,7 +22,7 @@ PATH = str(pathlib.Path(__file__).parent.resolve()) + "/cool_model.keras"
 
 CNN_MODEL = tf.keras.models.load_model(PATH)
 
-TOTAL_IMAGES = 3
+slidervalue = 3
 url = "https://prnt.sc/"
 
 # Set up Chrome options
@@ -47,10 +47,11 @@ PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 IMAGE_DIR = os.path.join(PROJECT_ROOT, "saved_images")
 os.makedirs(IMAGE_DIR, exist_ok=True)
 
-@app.route('/api/images', methods=['GET'])
-def get_images():
+@app.route('/api/images/<slidervalue>', methods=['GET'])
+def get_images(slidervalue):
     # delete_images()
-    images = find_image_url()
+    print("Slidervalue:", slidervalue)
+    images = find_image_url(int(slidervalue))
     print("Returning images:", images)
     return jsonify(images)
 
@@ -90,11 +91,11 @@ def check_image_csv():
         return df.to_dict('records')
     return []
 
-def find_image_url():
+def find_image_url(slidervalue):
     images = check_image_csv()
     num_images = 0
     all_images = set()
-    while num_images < TOTAL_IMAGES:
+    while num_images < slidervalue:
         image_url = generate_url()
         print("Checking", image_url)
 
@@ -143,7 +144,7 @@ def find_image_url():
 
                     images.append(full_image)
                     num_images += 1
-                    print("\033[92m" + f"Image added to list {num_images}/{TOTAL_IMAGES}" + "\033[0m")
+                    print("\033[92m" + f"Image added to list {num_images}/{slidervalue}" + "\033[0m")
                 else:
                     print("\033[93m" + "Image not added to list" + "\033[0m")
 
