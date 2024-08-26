@@ -12,14 +12,18 @@ from PIL import Image
 import random
 import time
 import os
+import pathlib
 
 app = Flask(__name__)
 CORS(app) # allow cors for all routes
 
 # Load the model
-CNN_MODEL = tf.keras.models.load_model("scripts/cool_model.keras", compile=False)
+PATH = str(pathlib.Path(__file__).parent.resolve()) + "/cool_model.keras"
+print(PATH)
 
-TOTAL_IMAGES = 5
+CNN_MODEL = tf.keras.models.load_model(PATH)
+
+TOTAL_IMAGES = 20
 url = "https://prnt.sc/"
 
 # Set up Chrome options
