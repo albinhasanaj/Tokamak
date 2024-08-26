@@ -24,7 +24,7 @@ const Explore = () => {
                 const data = await res.json();
 
                 console.log(data)
-                setImages(data);
+                setImages(data.reverse());
                 setLoading(false);
 
             } else {
