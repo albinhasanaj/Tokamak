@@ -1,30 +1,33 @@
-"use client";
+"use client"
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import React, { Fragment, useEffect, useState } from 'react';
-import ProfilePosts, { Post } from "./ProfileFeedContainer";
-import { useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { useSearchParams, usePathname } from 'next/navigation';
 
-interface ImageProps {
-    image: string; // Matches the key from the Python script output
-    width: number;
-    height: number;
+// Define your Post interface
+export interface Post {
+    id: number;
+    title: string;
+    image: string;
+    width?: number;
+    height?: number;
 }
 
+// Initialize an empty array for ProfilePosts
+const ProfilePosts: Post[] = [];
+
 const ProfileFeed: React.FC = () => {
-    const [images, setImages] = useState<ImageProps[]>([]); // Updated initial state type
+    const [images, setImages] = useState<Post[]>([]); // State to hold fetched posts
     const [loading, setLoading] = useState<boolean>(true);
-    const [refresh, setRefresh] = useState<boolean>(false);
     const searchParams = useSearchParams();
     const pathname = usePathname();
-    const [scaleImage, setScaleImage] = React.useState(false);
+    const [scaleImage, setScaleImage] = useState(false);
 
-    // Parse post ID and title from the query parameters
     const selectedPostId = searchParams.get('post');
     const selectedPostTitle = searchParams.get('post_title')?.replace(/_/g, ' ');
 
-    const selectedPost = ProfilePosts.find(
+    const selectedPost = images.find(
         (post: Post) => post.id === Number(selectedPostId) && post.title === selectedPostTitle
     ) || null;
 
@@ -32,35 +35,40 @@ const ProfileFeed: React.FC = () => {
         setScaleImage(!scaleImage);
     };
 
-    const fetchData = async (path: string) => {
+    const handleDisableScaleImage = () => {
+        setScaleImage(false);
+    }
+
+    // Fetch data from the Python server and populate ProfilePosts array
+    const fetchProfilePosts = async () => {
         try {
-            const res = await fetch(`http://localhost:5000/api/${path}`); // Direct request to Python server
+            const res = await fetch('http://localhost:5000/api/images/serveAll'); // Adjust endpoint as needed
             if (res.ok) {
                 const data = await res.json();
-                const arrData = data.map((item: any, index: number) => {
-                    return {
-                        id: index + 1,
-                        title: "Post " + (index + 1),
-                        image: item.image,
-                        width: item.width,
-                        height: item.height,
-                    };
-                });
+                const fetchedPosts = data.map((item: any, index: number) => ({
+                    id: index + 1,
+                    title: `Post ${index + 1}`,
+                    image: item.image,
+                    width: item.width,
+                    height: item.height,
+                }));
+
+                ProfilePosts.push(...fetchedPosts); // Populate ProfilePosts with fetched data
+                setImages(ProfilePosts); // Update state with the populated array
                 setLoading(false);
-                setImages(arrData);
             } else {
                 throw new Error("Network response was not ok");
             }
         } catch (error) {
             setLoading(true);
-            console.error("There was an error!", error);
+            console.error("There was an error fetching images!", error);
             toast.error("There was an error fetching images. Please try again later.");
         }
     };
 
+    // UseEffect to fetch the data when component mounts
     useEffect(() => {
-        fetchData('images/serveAll');
-
+        fetchProfilePosts();
     }, []);
 
     return (
@@ -76,15 +84,13 @@ const ProfileFeed: React.FC = () => {
                             <div
                                 className={`bg-gray-700 w-64 h-64 rounded-md relative cursor-pointer overflow-hidden transition-transform duration-300 ${selectedPost?.id === post.id ? 'scale-110' : 'hover:scale-105'}`}
                             >
-                                {images.length > 0 && images[post.id - 1] && (  // Adjust this to map the correct image to the post
-                                    <Image
-                                        src={images[post.id - 1].image}  // Display the corresponding image for the post
-                                        width={images[post.id - 1].width}
-                                        height={images[post.id - 1].height}
-                                        className="object-cover w-full h-full absolute inset-0"
-                                        alt={`Image for post ${post.title}`}
-                                    />
-                                )}
+                                <Image
+                                    src={post.image}
+                                    width={post.width}
+                                    height={post.height}
+                                    className="object-cover w-full h-full absolute inset-0"
+                                    alt={`Image for post ${post.title}`}
+                                />
                                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                                     <h1 className="text-xl font-bold text-center">{post.title}</h1>
                                 </div>
@@ -98,16 +104,12 @@ const ProfileFeed: React.FC = () => {
                 ))}
             </div>
 
-            {/* Overlay for the selected post */}
             {selectedPost && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-20">
-                    <div className={`relative bg-gray-700 w-[90vw] h-[90vh] max-w-screen-lg max-h-screen rounded-lg overflow-hidden transition-transform duration-500`}>
+                    <div className="relative bg-gray-700 w-[90vw] h-[90vh] max-w-screen-lg max-h-screen rounded-lg overflow-hidden transition-transform duration-500">
                         <Link href={pathname} passHref>
-                            <button
-                                className="absolute top-4 right-4 bg-black bg-opacity-70 text-white rounded-full p-2 hover:bg-opacity-100 transition-opacity"
-                                aria-label="Close"
-                            >
-                                <Image src='/images/cross.svg' alt='Close' width={24} height={24} />
+                            <button className="absolute top-4 right-4 bg-black bg-opacity-70 text-white rounded-full p-2 hover:bg-opacity-100 transition-opacity" aria-label="Close">
+                                <Image onClick={handleDisableScaleImage} src='/images/cross.svg' alt='Close' width={24} height={24} />
                             </button>
                         </Link>
                         <div className="flex items-center justify-center h-full p-5 flex-col gap-10">
@@ -116,16 +118,14 @@ const ProfileFeed: React.FC = () => {
                                     <h1 className={`text-3xl font-bold absolute top-[1%] transition-opacity duration-300 ${scaleImage ? 'opacity-0' : 'opacity-100'}`}>
                                         {selectedPost.title}
                                     </h1>
-                                    {images.length > 0 && images[selectedPost.id - 1] && (  // Only show the image corresponding to the selected post
-                                        <Image
-                                            src={images[selectedPost.id - 1].image}  // Show the image for the selected post
-                                            width={images[selectedPost.id - 1].width}
-                                            height={images[selectedPost.id - 1].height}
-                                            className={`object-contain select-none max-h-[85%] max-w-full w-[450px] cursor-pointer transition-all duration-[350ms] z-40 ${scaleImage ? 'transform scale-125 translate-x-[50%] translate-y-[0%] left-1/2 top-1/2' : 'hover:scale-[1.02]'}`}
-                                            alt={`Image for post ${selectedPost.title}`}
-                                            onClick={handleScaleImage}
-                                        />
-                                    )}
+                                    <Image
+                                        src={selectedPost.image}
+                                        width={selectedPost.width}
+                                        height={selectedPost.height}
+                                        className={`object-contain select-none max-h-[85%] max-w-full w-[450px] cursor-pointer transition-all duration-[350ms] z-40 ${scaleImage ? 'transform scale-150 translate-x-[50%] translate-y-[0%] left-1/2 top-1/2' : 'hover:scale-[1.02]'}`}
+                                        alt={`Image for post ${selectedPost.title}`}
+                                        onClick={handleScaleImage}
+                                    />
                                 </div>
                                 <div className={`flex flex-col max-w-[400px] w-full justify-center gap-20 h-full transition-opacity duration-300 ${scaleImage ? 'opacity-25 pointer-events-none' : 'opacity-100'}`}>
                                     {/* Comment Section */}
@@ -155,7 +155,6 @@ const ProfileFeed: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
