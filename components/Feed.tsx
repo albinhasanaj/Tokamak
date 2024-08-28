@@ -18,7 +18,7 @@ const Feed: React.FC<FeedProps> = ({ images, selectedPost, scaleImage, onSelectP
     return (
         <main className='w-full flex flex-col items-center'>
             {/* Images Grid */}
-            <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4">
+            <div className="flex flex-wrap justify-center gap-4">
                 {images.length > 0 && (
                     <Fragment>
                         {images.map((post) => (
@@ -70,7 +70,7 @@ const Feed: React.FC<FeedProps> = ({ images, selectedPost, scaleImage, onSelectP
                                         src={selectedPost.image}
                                         width={selectedPost.width}
                                         height={selectedPost.height}
-                                        className={`object-contain select-none w-[750px] cursor-pointer transition-all duration-[350ms] z-40 ${scaleImage ? 'transform scale-[1.25] translate-x-[0%] translate-y-[0%] left-1/2 top-1/2' : 'hover:scale-[1.02]'}`}
+                                        className={`object-contain select-none w-full cursor-pointer transition-all duration-[350ms] z-40 ${scaleImage ? 'transform scale-[1.50] translate-x-[0%] translate-y-[0%] left-1/2 top-1/2' : 'hover:scale-[1.02]'}`}
                                         alt={`Image for post ${selectedPost.title}`}
                                         onClick={onToggleScaleImage}
                                     />
