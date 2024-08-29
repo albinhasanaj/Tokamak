@@ -1,6 +1,6 @@
 // components/Feed.tsx
 
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import Image from 'next/image';
 import { Post } from '../types/types.d'; // Adjust path if necessary
 import Link from 'next/link';
@@ -15,6 +15,39 @@ interface FeedProps {
 }
 
 const Feed: React.FC<FeedProps> = ({ images, selectedPost, scaleImage, onSelectPost, onDeselectPost, onToggleScaleImage }) => {
+    const [description, setDescription] = useState('');
+
+    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setDescription(e.target.value);
+    };
+
+    const handlePost = async () => {
+        if (!selectedPost) return;
+        try {
+            const response = await fetch('/api/posts', { // Adjust the endpoint according to your API
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    postId: selectedPost.id,
+                    description: description,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save description');
+            }
+
+            // Handle successful post
+            alert('Description posted successfully!');
+            setDescription(''); // Clear the input
+        } catch (error) {
+            console.error('Error posting description:', error);
+            alert('Failed to post description.');
+        }
+    };
+
     return (
         <main className='w-full flex flex-col items-center'>
             {/* Images Grid */}
@@ -77,8 +110,22 @@ const Feed: React.FC<FeedProps> = ({ images, selectedPost, scaleImage, onSelectP
                                 </div>
                                 <div className={`flex flex-col max-w-[400px] w-full justify-center  transition-opacity duration-300 ${scaleImage ? 'opacity-25 pointer-events-none' : 'opacity-100'}`}>
                                     <div className='flex flex-col items-center gap-4'>
-                                        <textarea placeholder='Add description...' name="comment" id="comment" cols={20} rows={6} className='text-white w-full bg-[#38424d] border-[2px] border-[#4B5766] focus:border-[rgba(255,255,255,1)] outline-none font-istok p-2 rounded-md resize-none'></textarea>
-                                        <button className='bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-5 py-2 rounded-md shadow-md transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-cyan-300'>Post</button>
+                                        <textarea
+                                            placeholder='Add description...'
+                                            name="comment"
+                                            id="comment"
+                                            cols={20}
+                                            rows={6}
+                                            value={description}
+                                            onChange={handleDescriptionChange}
+                                            className='text-white w-full bg-[#38424d] border-[2px] border-[#4B5766] focus:border-[rgba(255,255,255,1)] outline-none font-istok p-2 rounded-md resize-none'
+                                        />
+                                        <button
+                                            onClick={handlePost}
+                                            className='bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-5 py-2 rounded-md shadow-md transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-cyan-300'
+                                        >
+                                            Post
+                                        </button>
                                     </div>
                                 </div>
                             </div>
