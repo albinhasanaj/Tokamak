@@ -49,7 +49,7 @@ const Feed: React.FC<FeedProps> = ({ images, selectedPost, scaleImage, onSelectP
     return (
         <main className='w-full flex flex-col items-center'>
             {/* Images Grid */}
-            <div className="flex flex-wrap justify-center gap-4">
+            <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4">
                 {images.length > 0 && (
                     <Fragment>
                         {images.map((post) => (
@@ -59,27 +59,29 @@ const Feed: React.FC<FeedProps> = ({ images, selectedPost, scaleImage, onSelectP
                                     as={`/explore?post=${post.id}&post_title=${encodeURIComponent(post.title.replace(/ /g, '_'))}`}
                                     title={post.title}
                                 >
-                                    <div
-                                        className={`bg-gray-700 w-64 h-64 rounded-md relative cursor-pointer overflow-hidden transition-transform duration-300 ${selectedPost?.id === post.id ? 'scale-110' : 'hover:scale-105'}`}
-                                        onClick={() => onSelectPost(post)}
+                                    <Link
+                                        href=""
+                                        className={`relative`}
+                                        onClick={(e) => {
+                                            // Prevent the default link behavior to avoid scrolling to the top
+                                            e.preventDefault();
+                                            onSelectPost(post);
+                                        }}
                                     >
                                         <Image
-                                            src={post.image}
-                                            width={post.width}
-                                            height={post.height}
-                                            className="object-cover w-full h-full absolute inset-0"
-                                            alt={`Image for post ${post.title}`}
+                                            src={post.image}  // Correct property name for src
+                                            width={post.width}  // Correct property name for width
+                                            height={post.height}  // Correct property name for height
+                                            className={`rounded-lg  w-[300px] h-auto transition-all duration-300 hover:scale-105`}
+                                            alt={`Random image`} // Unique alt text for accessibility
                                         />
-                                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                                            <h1 className="text-xl font-bold text-white text-center">{post.title}</h1>
-                                        </div>
-                                    </div>
+                                    </Link>
                                 </Link>
                             </div>
                         ))}
                     </Fragment>
                 )}
-            </div>
+            </div >
 
             {selectedPost && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-20">
@@ -131,7 +133,7 @@ const Feed: React.FC<FeedProps> = ({ images, selectedPost, scaleImage, onSelectP
                     </div>
                 </div>
             )}
-        </main>
+        </main >
     );
 };
 
