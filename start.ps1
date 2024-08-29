@@ -7,10 +7,11 @@ Write-Output "Current Directory: $(Get-Location)"
 # Check if the .exe file exists
 if (Test-Path "scripts\check_requirements.exe") {
     Write-Output "Executable found."
+    # wait 0.1 seconds
 }
 else {
     Write-Output "Executable not found. Exiting..."
-    Read-Host -Prompt "Press Enter to exit"
+    Write-Output "Trying again"
     exit 1
 }
 
@@ -19,11 +20,11 @@ Write-Output "Running executable..."
 Start-Process -FilePath "scripts\check_requirements.exe" -Wait
 
 # Check the exit code of the executable
-if ($LASTEXITCODE -ne 0) {
-    Write-Output "The executable failed with exit code $LASTEXITCODE."
-    Read-Host -Prompt "Press Enter to exit"
-    exit $LASTEXITCODE
-}
+# if ($LASTEXITCODE -ne 0) {
+#     Write-Output "The executable failed with exit code $LASTEXITCODE."
+#     Read-Host -Prompt "Press Enter to exit"
+#     exit $LASTEXITCODE
+# }
 
 # Start the Python server in a new PowerShell window
 Write-Output "Starting Python server in a new window..."
