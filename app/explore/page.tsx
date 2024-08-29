@@ -18,6 +18,7 @@ const Explore: React.FC = () => {
     const [sliderValue, setSliderValue] = useState<number>(1);
     const [selectedPost, setSelectedPost] = useState<Post | null>(null);
     const [scaleImage, setScaleImage] = useState(false);
+    const [link, setLink] = useState('');
 
     const searchParams = useSearchParams();
     const pathname = usePathname();
@@ -67,6 +68,7 @@ const Explore: React.FC = () => {
 
     const handleSelectPost = (post: Post) => {
         setSelectedPost(post);
+        setLink(post.image)
         window.history.pushState(null, '', `${pathname}?post=${post.id}&post_title=${encodeURIComponent(post.title.replace(/ /g, '_'))}`);
     };
 
@@ -106,6 +108,7 @@ const Explore: React.FC = () => {
                 onSelectPost={handleSelectPost}
                 onDeselectPost={handleDeselectPost}
                 onToggleScaleImage={handleToggleScaleImage}
+                imageLink={link}
             />
         </main>
     );

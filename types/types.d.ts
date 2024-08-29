@@ -11,3 +11,13 @@ export interface Post {
     width?: number;
     height?: number;
 }
+
+declare interface FeedProps {
+    images: Post[];
+    selectedPost: Post | null;
+    scaleImage: boolean;
+    onSelectPost: (post: Post) => void;
+    onDeselectPost: () => void;
+    onToggleScaleImage: () => void;
+    imageLink: string;
+}
