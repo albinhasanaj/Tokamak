@@ -2,19 +2,11 @@
 
 import React, { Fragment, useState } from 'react';
 import Image from 'next/image';
-import { Post } from '../types/types.d'; // Adjust path if necessary
+import { FeedProps, Post } from '../types/types.d'; // Adjust path if necessary
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
-interface FeedProps {
-    images: Post[];
-    selectedPost: Post | null;
-    scaleImage: boolean;
-    onSelectPost: (post: Post) => void;
-    onDeselectPost: () => void;
-    onToggleScaleImage: () => void;
-}
-
-const Feed: React.FC<FeedProps> = ({ images, selectedPost, scaleImage, onSelectPost, onDeselectPost, onToggleScaleImage }) => {
+const Feed: React.FC<FeedProps> = ({ images, selectedPost, scaleImage, onSelectPost, onDeselectPost, onToggleScaleImage, imageLink }) => {
     const [description, setDescription] = useState('');
 
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -24,27 +16,33 @@ const Feed: React.FC<FeedProps> = ({ images, selectedPost, scaleImage, onSelectP
     const handlePost = async () => {
         if (!selectedPost) return;
         try {
-            const response = await fetch('/api/posts', { // Adjust the endpoint according to your API
-                method: 'POST',
+
+            console.log(description, imageLink);
+
+            await fetch("api/posts/addPost", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    postId: selectedPost.id,
-                    description: description,
+                    description,
+                    imageLink,
                 }),
+            }
+            ).then((res) => {
+                if (!res.ok) {
+                    toast.error('Failed to post description.');
+                    throw new Error('Failed to post description.');
+                }
+
+                toast.success('Description posted successfully!');
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to save description');
-            }
-
             // Handle successful post
-            alert('Description posted successfully!');
             setDescription(''); // Clear the input
         } catch (error) {
             console.error('Error posting description:', error);
-            alert('Failed to post description.');
+            toast.error('Failed to post description.');
         }
     };
 
