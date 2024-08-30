@@ -1,5 +1,5 @@
 "use client"
-import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut, SignInButton, SignOutButton } from '@clerk/nextjs'
+import { ClerkProvider, RedirectToSignIn, RedirectToUserProfile, SignedIn, SignedOut, SignInButton, SignOutButton, UserButton } from '@clerk/nextjs'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
@@ -67,6 +67,7 @@ const Sidebar = () => {
 
     return (
         <div>
+
             {/* Desktop Sidebar */}
             <div className='hidden w-[300px] md:block p-5 h-screen'>
                 <div className='w-[300px] h-[95%] bg-secondary md:flex flex-col pt-5 justify-between self-center rounded-md fixed z-[9999]'>
@@ -118,9 +119,7 @@ const Sidebar = () => {
                         <div ref={profileRef}>
                             {isOpen ? (
                                 <ul>
-                                    <li>
-                                        <button className='bg-[#717984] text-white w-full h-[50px] text-xl font-bold font-istok hover:bg-[#676f79] select-none'>Settings</button>
-                                    </li>
+
                                     <div className='w-full h-[1px] bg-[#d9d9d9] bg-opacity-50' />
                                     <li>
                                         <SignOutButton>
@@ -132,8 +131,8 @@ const Sidebar = () => {
                                 <div className='w-full h-[1px] bg-[#717984]' />
                             )}
                             <div onClick={handleOpen} className='cursor-pointer flex items-center gap-8 justify-between px-7 py-4 select-none hover:bg-white hover:bg-opacity-5'>
-                                <div className='flex items-center gap-3'>
-                                    <Image src="/images/ProfilePic.svg" width={55} height={55} alt="ProfilePic" className='rounded-full' draggable="false" />
+                                <div className='flex items-center gap-5'>
+                                    <UserButton />
                                     <p className='text-white text-xl font-bold text-center '>Username</p>
                                 </div>
                                 <Image src="/images/arrow.svg" width={24} height={24} alt="Arrow" className={`transition-all ${isOpen ? "rotate-180" : ""}`} draggable="false" />
