@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useSearchParams, usePathname } from 'next/navigation';
 import Feed from '@/components/Feed';
+import { MoonLoader } from 'react-spinners';
 
 export interface Post {
     id: number;
@@ -53,8 +54,8 @@ const Explore: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        const id = searchParams.get('post');
-        const title = searchParams.get('post_title')?.replace(/_/g, ' ');
+        const id = searchParams?.get('post');
+        const title = searchParams?.get('post_title')?.replace(/_/g, ' ');
         if (id && title) {
             const post = images.find((image: Post) => image.id === Number(id) && image.title === title);
             setSelectedPost(post || null);
@@ -96,10 +97,11 @@ const Explore: React.FC = () => {
                 <span>{sliderValue}</span>
             </div>
             <button
+                {...(loading ? { disabled: true } : {})}
                 onClick={handleRefresh}
                 className="px-6 py-3 mb-6 text-white bg-blue-500 rounded-lg hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-300"
             >
-                Refetch Images
+                {loading ? <MoonLoader className='absolute top-0 right-[50%]' color="#ffffff" size={20} /> : "Refetch Images"}
             </button>
             <Feed
                 images={images}
