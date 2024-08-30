@@ -99,9 +99,9 @@ const Explore: React.FC = () => {
             <button
                 {...(loading ? { disabled: true } : {})}
                 onClick={handleRefresh}
-                className="px-6 py-3 mb-6 text-white bg-blue-500 rounded-lg hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-300"
+                className="w-[150px] h-[50px] mb-6 text-white bg-blue-500 rounded-lg hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-300 flex items-center justify-center"
             >
-                {loading ? <MoonLoader className='absolute top-0 right-[50%]' color="#ffffff" size={20} /> : "Refetch Images"}
+                {loading ? <MoonLoader color="#ffffff" size={24} /> : "Refetch Images"}
             </button>
             <Feed
                 images={images}

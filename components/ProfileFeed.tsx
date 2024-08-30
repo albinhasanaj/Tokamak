@@ -12,7 +12,7 @@ export interface Post {
     image: string;
     width?: number;
     height?: number;
-    post_number: number; // Add the 'post_number' property
+    post_number: number;
 }
 
 const ProfileFeed: React.FC = () => {
