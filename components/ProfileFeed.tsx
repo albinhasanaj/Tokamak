@@ -12,6 +12,7 @@ export interface Post {
     image: string;
     width?: number;
     height?: number;
+    post_number: number; // Add the 'post_number' property
 }
 
 const ProfileFeed: React.FC = () => {
@@ -20,13 +21,15 @@ const ProfileFeed: React.FC = () => {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const [scaleImage, setScaleImage] = useState(false);
+    const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
 
-    const selectedPostId = searchParams?.get('post') ?? null;
-    const selectedPostTitle = searchParams?.get('post_title')?.replace(/_/g, ' ');
+    const handleSelectPost = (post: Post) => {
+        setSelectedPost(post);
+    };
 
-    const selectedPost = images.find(
-        (post: Post) => post.id === Number(selectedPostId) && post.title === selectedPostTitle
-    ) || null;
+    const handleDisableSelectPost = () => {
+        setSelectedPost(undefined);
+    }
 
     const handleScaleImage = () => {
         setScaleImage(!scaleImage);
@@ -34,7 +37,7 @@ const ProfileFeed: React.FC = () => {
 
     const handleDisableScaleImage = () => {
         setScaleImage(false);
-    }
+    };
 
     // Fetch data from the Python server and populate ProfilePosts array
     const fetchProfilePosts = async () => {
@@ -59,8 +62,7 @@ const ProfileFeed: React.FC = () => {
             console.log(fetchedPosts);
 
             // sort low to high
-            // @ts-expect-error me too lazy to fix this ts error
-            fetchedPosts.sort((a: number, b: number) => a.post_number - b.post_number);
+            fetchedPosts.sort((a: Post, b: Post) => a.post_number - b.post_number);
             setImages(fetchedPosts); // Update state with the populated array
         } catch (error) {
             setLoading(true);
@@ -83,9 +85,10 @@ const ProfileFeed: React.FC = () => {
                             href={`${pathname}?post=${post.id}&post_title=${encodeURIComponent(post.title.replace(/ /g, '_'))}`}
                             as={`${pathname}?post=${post.id}&post_title=${encodeURIComponent(post.title.replace(/ /g, '_'))}`}
                             title={post.title}
+                            onClick={() => handleSelectPost(post)}
                         >
                             <div
-                                className={`bg-gray-700 w-64 h-64 rounded-md relative cursor-pointer overflow-hidden transition-transform duration-300 ${selectedPost?.id === post.id ? 'scale-110' : 'hover:scale-105'}`}
+                                className={`bg-gray-700 w-64 h-64 rounded-md relative cursor-pointer overflow-hidden transition-transform duration-300 ${selectedPost ? 'scale-110' : 'hover:scale-105'}`}
                             >
                                 <Image
                                     src={post.image}
@@ -112,7 +115,13 @@ const ProfileFeed: React.FC = () => {
                     <div className="relative bg-gray-700 w-[90vw] h-[90vh] max-w-screen-lg max-h-screen rounded-lg overflow-hidden transition-transform duration-500">
                         <Link href={pathname ?? ''} passHref>
                             <button className="absolute top-4 right-4 bg-black bg-opacity-70 text-white rounded-full p-2 hover:bg-opacity-100 transition-opacity" aria-label="Close">
-                                <Image onClick={handleDisableScaleImage} src='/images/cross.svg' alt='Close' width={24} height={24} />
+                                <Image
+                                    onClick={() => {
+                                        handleDisableSelectPost();
+                                        handleDisableScaleImage();
+                                    }}
+                                    src='/images/cross.svg' alt='Close' width={24} height={24}
+                                />
                             </button>
                         </Link>
                         <div className="flex items-center justify-center h-full p-5 flex-col gap-10">
@@ -123,8 +132,8 @@ const ProfileFeed: React.FC = () => {
                                     </h1>
                                     <Image
                                         src={selectedPost.image}
-                                        width={selectedPost.width}
-                                        height={selectedPost.height}
+                                        width={300}
+                                        height={300}
                                         className={`object-contain select-none max-h-[85%] max-w-full w-[450px] cursor-pointer transition-all duration-[350ms] z-40 ${scaleImage ? 'transform scale-150 translate-x-[50%] translate-y-[0%] left-1/2 top-1/2' : 'hover:scale-[1.02]'}`}
                                         alt={`Image for post ${selectedPost.title}`}
                                         onClick={handleScaleImage}

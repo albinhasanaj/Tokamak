@@ -40,3 +40,4 @@ next-env.d.ts
 cool_model.keras
 saved_images/
 images.csv
+.vscode/
