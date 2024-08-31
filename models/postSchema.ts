@@ -2,6 +2,13 @@ import mongoose from "mongoose";
 import mongooseSequence from "mongoose-sequence";
 
 // Initialize the AutoIncrement plugin
+const likesSchema = new mongoose.Schema({
+    userId: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+});
 //@ts-expect-error too lazy to fix this ts error	
 const AutoIncrement = mongooseSequence(mongoose);
 
@@ -22,7 +29,12 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    likes: {
+        type: [likesSchema],
+        default: [],
+    },
 });
+
 
 // Check if the model already exists to avoid re-defining it
 if (!mongoose.models.Posts) {

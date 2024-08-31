@@ -8,7 +8,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(405).json({ error: 'Method Not Allowed' })
     }
 
-    console.log("reached")
     const { userId } = getAuth(req)
 
     if (!userId) {
