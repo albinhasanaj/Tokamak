@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import { userAgent } from "next/server";
 import React, { useState } from "react";
 import { FcLike } from "react-icons/fc";
-// import { comments } from "../constants/api/comments.ts";
+import comments from "../constant/api/comments";
 
 const Post = () => {
   const [isFocused, setIsFocused] = useState(false);
@@ -15,6 +16,21 @@ const Post = () => {
   const handleClose = () => {
     setIsFocused(false);
   };
+
+  // const comments = [
+  //   {
+  //     user: "user1",
+  //     text: "This is a comment",
+  //   },
+  //   {
+  //     user: "user2",
+  //     text: "This is another comment",
+  //   },
+  //   {
+  //     user: "user3",
+  //     text: "This is a third comment",
+  //   },
+  // ];
 
   return (
     <>
@@ -65,7 +81,7 @@ const Post = () => {
                 alt="no image"
                 width={554}
                 height={603}
-                className="w-full h-[480px] md:h-[603px]"
+                className="w-full h-[400px] md:h-[603px]"
               />
             </div>
             <div className="w-[40%] flex-col hidden md:flex bg-black">
@@ -74,17 +90,20 @@ const Post = () => {
                 i went on this beautiful place to watch people eat my katttomtte
               </p>
               <div className="overflow-y-auto ml-4 flex-grow bg-black h-0">
-                {/* {comments.map((comment) => (
-                  <p>{comment.text}</p>
-                ))} */}
+                {comments.map((comment) => (
+                  <>
+                    <span className="text-white">{comment.user}</span>
+                    <p className="text-white">{comment.text}</p>
+                  </>
+                ))}
                 <div className="flex w-full bg-slate-800">
-                  <input type="text" className="w-[80%]"/>
+                  <input type="text" className="w-[80%]" />
                   <button className="flex justify-center w-[20%]">Send</button>
                 </div>
               </div>
             </div>
           </div>
-          <div className="max-w-[890px] mt-4 w-full flex justify-start">
+          <div className="max-w-[890px] mt-2 w-full flex justify-start">
             <div className="flex flex-row justify-between items-center w-[100%]">
               <div className="flex flex-row items-center justify-start gap-2">
                 <Image
@@ -104,16 +123,19 @@ const Post = () => {
               </div>
             </div>
           </div>
-          <div className="bg-black mt-4 rounded-3xl md:hidden">
+          <div className="bg-black mt-1 rounded-3xl md:hidden">
             <div className="flex flex-col">
-              <p className="mt-2 ml-4 text-white">
+              <p className="mt-1 ml-4 text-white">
                 a lovely image of a really ocol thing that i really enjoyed when
                 i went on this beautiful place to watch people eat my katttomtte
               </p>
               <div className="overflow-y-auto ml-4 flex-grow max-h-[150px]">
-                {/* {comments.map((comment) => (
-                  <p>{comment.text}</p>
-                ))} */}
+                {comments.map((comment) => (
+                  <>
+                    <span className="text-cyan-400">{comment.user}</span>
+                    <p className="text-white p-0 m-0">{comment.text}</p>
+                  </>
+                ))}
               </div>
             </div>
           </div>

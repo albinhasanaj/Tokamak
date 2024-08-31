@@ -1,11 +1,20 @@
-const comments: string[] = [
-    "Great job!",
-    "I love this!",
-    "Nice work!",
-    "Keep it up!",
-    "Awesome!",
+const comments = [
+  {
+    user: "user1",
+    text: "This is a comment",
+  },
+  {
+    user: "user2",
+    text: "This is another comment",
+  },
+  {
+    user: "user3",
+    text: "This is a third comment",
+  },
+  {
+    user: "user4",
+    text: "This is a fourth comment",
+  },
 ];
-
-console.log(comments);
 
 export default comments;
