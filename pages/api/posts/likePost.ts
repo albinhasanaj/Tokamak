@@ -16,9 +16,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
+    console.log('userId:', userId);
+
     if (!postId) {
         return res.status(400).json({ error: 'Post ID is required' });
     }
+
+    console.log('postId:', postId);
 
     try {
         await connectToDB();
@@ -30,10 +34,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         // Check if the user has already liked the post
-        const hasLiked = post.likes.some((like: { userId: string }) => like.userId === userId);
-        if (hasLiked) {
+        const liked = post.likes.find((like: any) => like.userId === userId);
+        if (liked) {
             // Unlike the post
-            post.likes = post.likes.filter((like: { userId: string }) => like.userId !== userId);
+            post.likes = post.likes.filter((like: any) => like.userId !== userId);
+            await post.save();
             return res.status(200).json({ message: 'Post unliked' });
         }
 
