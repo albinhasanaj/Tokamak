@@ -1,91 +1,119 @@
 "use client";
-import React, { Fragment, useEffect, useState } from 'react';
-import Image from 'next/image';
-import { MoonLoader } from 'react-spinners';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useSearchParams, usePathname } from 'next/navigation';
+import Feed from '@/components/Feed';
+import { MoonLoader } from 'react-spinners';
 
-// Correct interface definition based on Python script output
-interface ImageProps {
-    image: string;  // Matches the key from the Python script output
-    width: number;
-    height: number;
+export interface Post {
+    id: number;
+    title: string;
+    image: string;
+    width?: number;
+    height?: number;
 }
 
-const Explore = () => {
-    const [images, setImages] = useState<ImageProps[]>([]); // Updated initial state type
+const Explore: React.FC = () => {
+    const [images, setImages] = useState<Post[]>([]); // State to hold fetched posts
     const [loading, setLoading] = useState<boolean>(true);
-    const [refresh, setRefresh] = useState<boolean>(false);
+    const [sliderValue, setSliderValue] = useState<number>(1);
+    const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+    const [scaleImage, setScaleImage] = useState(false);
+    const [link, setLink] = useState('');
+
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
 
     const fetchData = async (path: string) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/${path}`); // Direct request to Python server
+            setLoading(true);
+            const res = await fetch(`http://localhost:5000/api/${path}`);
             if (res.ok) {
                 const data = await res.json();
-
-                console.log(data)
-                setImages(data);
+                const fetchedPosts = data.map((item: any, index: number) => ({
+                    id: index + 1,
+                    title: `Post ${index + 1}`,
+                    image: item.image,
+                    width: item.width,
+                    height: item.height,
+                })).reverse();
+                setImages(fetchedPosts); // Remove .reverse() if you don't need the reversed order
                 setLoading(false);
-
             } else {
                 throw new Error("Network response was not ok");
             }
-
         } catch (error) {
-            setLoading(true);
-            console.error("There was an error!", error);
+            setLoading(false);
+            console.error("There was an error fetching images!", error);
             toast.error("There was an error fetching images. Please try again later.");
         }
-
-    }
+    };
 
     useEffect(() => {
         fetchData('images/serveAll');
     }, []);
 
+    useEffect(() => {
+        const id = searchParams?.get('post');
+        const title = searchParams?.get('post_title')?.replace(/_/g, ' ');
+        if (id && title) {
+            const post = images.find((image: Post) => image.id === Number(id) && image.title === title);
+            setSelectedPost(post || null);
+            setScaleImage(false);
+        }
+    }, [searchParams, images]);
 
     const handleRefresh = () => {
-        setLoading(true);
-        fetchData('images');
-    }
+        fetchData(`images/${sliderValue}`);
+    };
+
+    const handleSelectPost = (post: Post) => {
+        setSelectedPost(post);
+        setLink(post.image)
+        window.history.pushState(null, '', `${pathname}?post=${post.id}&post_title=${encodeURIComponent(post.title.replace(/ /g, '_'))}`);
+    };
+
+    const handleDeselectPost = () => {
+        setScaleImage(false);
+        setSelectedPost(null); // Clear selected post
+        window.history.replaceState(null, '', pathname); // Remove query params
+    };
+
+    const handleToggleScaleImage = () => {
+        setScaleImage(!scaleImage);
+    };
 
     return (
         <main className='w-full flex flex-col items-center'>
-            {/* Refetch Button */}
-            <button
-                onClick={handleRefresh}
-                className="px-6 py-3 mb-6 text-white bg-blue-500 rounded-lg hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-300"
-            >
-                Refetch Images
-            </button>
-
-            {/* Images Grid */}
-            <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4">
-                {loading ? (
-                    <div className="flex justify-center items-center h-screen w-full">
-                        <MoonLoader color="#fff" loading={loading} size={100} />
-                    </div>
-                ) : (
-                    <Fragment>
-                        {images.length > 0 && (  // Check if images array has content
-                            <Fragment>
-                                {images.map((image, index) => (
-                                    <div key={index} className="mb-4 break-inside-avoid">
-                                        <Image
-                                            src={image.image}  // Correct property name for src
-                                            width={image.width}  // Correct property name for width
-                                            height={image.height}  // Correct property name for height
-                                            className="rounded-lg w-[300px] h-auto"
-                                            alt={`Random image ${index}`} // Unique alt text for accessibility
-                                        />
-                                    </div>
-                                ))}
-                            </Fragment>
-                        )}
-                    </Fragment>
-                )}
+            <div className='flex gap-4 text-white w-full justify-center mt-6'>
+                <input
+                    type="range"
+                    min="1"
+                    max="25"
+                    value={sliderValue}
+                    className="w-1/4"
+                    onChange={(e) => setSliderValue(Number(e.target.value))}
+                />
+                <span>{sliderValue}</span>
             </div>
+            <button
+                {...(loading ? { disabled: true } : {})}
+                onClick={handleRefresh}
+                className="w-[150px] h-[50px] mb-6 text-white bg-blue-500 rounded-lg hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-300 flex items-center justify-center"
+            >
+                {loading ? <MoonLoader color="#ffffff" size={24} /> : "Refetch Images"}
+            </button>
+            <Feed
+                images={images}
+                selectedPost={selectedPost}
+                scaleImage={scaleImage}
+                onSelectPost={handleSelectPost}
+                onDeselectPost={handleDeselectPost}
+                onToggleScaleImage={handleToggleScaleImage}
+                imageLink={link}
+            />
         </main>
-    )
-}
+    );
+};
 
 export default Explore;

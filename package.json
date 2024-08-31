@@ -9,15 +9,21 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.3.3",
+    "@clerk/clerk-sdk-node": "^4.13.21",
+    "@clerk/nextjs": "^5.3.6",
     "@clerk/themes": "^2.1.21",
-    "@tanstack/react-query": "^5.52.1",
+    "@types/mongoose-sequence": "^3.0.11",
+    "clerk": "^0.8.3",
+    "mongodb": "^6.8.0",
+    "mongoose": "^8.5.4",
+    "mongoose-sequence": "^6.0.1",
     "next": "14.2.6",
     "react": "^18",
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
+    "react-icons": "^5.3.0",
     "react-spinners": "^0.14.1",
-    "react-icons": "^5.3.0"
+    "svix": "^1.31.0"
   },
   "devDependencies": {
     "@types/node": "^20",

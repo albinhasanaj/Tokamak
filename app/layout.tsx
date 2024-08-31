@@ -5,6 +5,7 @@ import Sidebar from "@/components/Sidebar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from '@clerk/themes'
 import { Toaster } from "react-hot-toast";
+import Countdown from "@/components/Countdown";
 
 export const metadata: Metadata = {
   title: "Tokamak",
@@ -20,10 +21,11 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
     >
 
       <html lang="en">
-        <body className="bg-primary flex">
+        <body className="bg-primary flex" suppressHydrationWarning>
           <Sidebar />
           {children}
           <Toaster />
+          <Countdown />
         </body>
       </html>
     </ClerkProvider>

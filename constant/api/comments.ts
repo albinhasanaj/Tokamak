@@ -15,6 +15,14 @@ const comments = [
     user: "user4",
     text: "This is a fourth comment",
   },
+  {
+    user: "user5",
+    text: "This is a fifth comment",
+  },
+  {
+    user: "user6",
+    text: "This is a sixdsfdsfdsokifhjodshfoisdhfoisdhoifhdsoijfdhsdjsfoihsadoifhsodaifhsd sdhf oisdahio fhasdoiuf hdsaoifh joiasdh foishfoith comment",
+  },
 ];
 
 export default comments;

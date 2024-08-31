@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { userAgent } from "next/server";
 import React, { useState } from "react";
 import { FcLike } from "react-icons/fc";
 import comments from "../constant/api/comments";
@@ -16,21 +15,6 @@ const Post = () => {
   const handleClose = () => {
     setIsFocused(false);
   };
-
-  // const comments = [
-  //   {
-  //     user: "user1",
-  //     text: "This is a comment",
-  //   },
-  //   {
-  //     user: "user2",
-  //     text: "This is another comment",
-  //   },
-  //   {
-  //     user: "user3",
-  //     text: "This is a third comment",
-  //   },
-  // ];
 
   return (
     <>
@@ -90,12 +74,23 @@ const Post = () => {
                 i went on this beautiful place to watch people eat my katttomtte
               </p>
               <div className="overflow-y-auto ml-4 flex-grow bg-black h-0">
-                {comments.map((comment) => (
-                  <>
-                    <span className="text-white">{comment.user}</span>
-                    <p className="text-white">{comment.text}</p>
-                  </>
-                ))}
+                <div className={`flex flex-col max-w-[400px] w-full justify-center gap-20 h-full transition-opacity duration-300`}>
+                  {/* Comment Section */}
+                  <div>
+                    <div className='flex flex-col overflow-y-auto h-[500px] rounded-t-md border-[2px] border-b-0 border-[#4B5766] justify-between bg-[#2e363f'>
+                      <div className='flex flex-col gap-3 bg-[#2e363f] p-4'>
+                        {comments.map((item, key) => (
+                          <p className='text-sm'><span className='font-bold text-cyan-400'>{item.user}:</span>{item.text}</p>
+
+                        ))}
+                      </div>
+                    </div>
+                    <div className='flex relative'>
+                      <input type="text" placeholder='Comment...' className='text-white w-full rounded-b-lg bg-[#38424d] border-[2px] border-[#4B5766] focus:border-[rgba(255,255,255,1)] outline-none font-istok p-2 pr-[80px]' />
+                      <button className='absolute h-[45px] right-[0] p-3 bottom-0 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold shadow-md transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-cyan-300'>Submit</button>
+                    </div>
+                  </div>
+                </div>
                 <div className="flex w-full bg-slate-800">
                   <input type="text" className="w-[80%]" />
                   <button className="flex justify-center w-[20%]">Send</button>
@@ -129,14 +124,6 @@ const Post = () => {
                 a lovely image of a really ocol thing that i really enjoyed when
                 i went on this beautiful place to watch people eat my katttomtte
               </p>
-              <div className="overflow-y-auto ml-4 flex-grow max-h-[150px]">
-                {comments.map((comment) => (
-                  <>
-                    <span className="text-cyan-400">{comment.user}</span>
-                    <p className="text-white p-0 m-0">{comment.text}</p>
-                  </>
-                ))}
-              </div>
             </div>
           </div>
         </div>
