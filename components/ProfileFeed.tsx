@@ -96,6 +96,7 @@ const ProfileFeed: React.FC = () => {
                                     height={100}
                                     className="object-cover w-full h-full absolute inset-0"
                                     alt={`Image for post ${post.title}`}
+                                    unoptimized={true}
                                 />
                                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                                     <h1 className="text-xl font-bold text-center">{post.title}</h1>
@@ -142,8 +143,8 @@ const ProfileFeed: React.FC = () => {
                                 <div className={`flex flex-col max-w-[400px] w-full justify-center gap-20 h-full transition-opacity duration-300 ${scaleImage ? 'opacity-25 pointer-events-none' : 'opacity-100'}`}>
                                     {/* Comment Section */}
                                     <div>
-                                        <div className='flex flex-col overflow-y-auto h-[500px] rounded-t-md border-[2px] border-b-0 border-[#4B5766] justify-between bg-[#2e363f'>
-                                            <div className='flex flex-col gap-3 bg-[#2e363f] p-4'>
+                                        <div className='flex flex-col overflow-y-auto h-[500px] bg-[#2e363f] rounded-t-md border-[2px] border-b-0 border-[#4B5766] justify-between bg-[#2e363f'>
+                                            <div className='flex flex-col gap-3 p-4'>
                                                 <p className='text-sm'><span className='font-bold text-cyan-400'>User1:</span> This is a comment on the post.</p>
                                                 <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Another comment here!</p>
                                                 <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Magni culpa possimus ipsa eligendi vero fuga architecto quos, commodi officia velit ipsum, perferendis id impedit exercitationem sint excepturi distinctio maxime! Suscipit!</p>
@@ -152,6 +153,10 @@ const ProfileFeed: React.FC = () => {
                                                 <p className='text-sm'><span className='font-bold text-cyan-400'>User2:</span> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Magni culpa possimus ipsa eligendi vero fuga architecto quos, commodi officia velit ipsum, perferendis id impedit exercitationem sint excepturi distinctio maxime! Suscipit!</p>
                                                 <p className='text-sm'><span className='font-bold text-cyan-400'>User1:</span> This song is SOOO GOOOD WTF!!???!?!</p>
                                                 <p className='text-sm'><span className='font-bold text-cyan-400'>User1:</span> This song is SOOO GOOOD WTF!!???!?!</p>
+                                                <p className='text-sm'><span className='font-bold text-white'>User1:</span> This song is SOOO GOOOD WTF!!???!?!</p>
+                                                <p className='text-sm'><span className='font-bold text-white'>User1:</span> This song is SOOO GOOOD WTF!!???!?!</p>
+                                                <p className='text-sm'><span className='font-bold text-white'>User1:</span> This song is SOOO GOOOD WTF!!???!?!</p>
+                                                <p className='text-sm'><span className='font-bold text-white'>User1:</span> This song is SOOO GOOOD WTF!!???!?!</p>
                                                 <p className='text-sm'><span className='font-bold text-white'>User1:</span> This song is SOOO GOOOD WTF!!???!?!</p>
                                             </div>
                                         </div>
