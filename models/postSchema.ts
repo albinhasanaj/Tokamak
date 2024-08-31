@@ -9,6 +9,19 @@ const likesSchema = new mongoose.Schema({
         unique: true,
     },
 });
+
+const commentSchema = new mongoose.Schema({
+    userId: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    comment: {
+        type: String,
+        required: true,
+    },
+});
+
 //@ts-expect-error too lazy to fix this ts error	
 const AutoIncrement = mongooseSequence(mongoose);
 
@@ -31,6 +44,10 @@ const postSchema = new mongoose.Schema({
     },
     likes: {
         type: [likesSchema],
+        default: [],
+    },
+    comments: {
+        type: [commentSchema],
         default: [],
     },
 });
