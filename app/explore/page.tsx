@@ -36,7 +36,13 @@ const Explore: React.FC = () => {
                     image: item.image,
                     width: item.width,
                     height: item.height,
-                })).reverse();
+                }))
+
+                if (path === 'images/serveAll') {
+                    fetchedPosts.reverse();
+                }
+
+
                 setImages(fetchedPosts); // Remove .reverse() if you don't need the reversed order
                 setLoading(false);
             } else {

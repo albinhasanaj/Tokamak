@@ -17,9 +17,7 @@ const Feed: React.FC<FeedProps> = ({ images, selectedPost, scaleImage, onSelectP
         if (!selectedPost) return;
         try {
 
-            console.log(description, imageLink);
-
-            await fetch("api/posts/addPost", {
+            await fetch("/api/posts/addPost", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -13,6 +13,7 @@ export interface Post {
   width?: number;
   height?: number;
   post_number: number;
+  likes?: number;
 }
 
 const HomeFeed = () => {
@@ -21,6 +22,7 @@ const HomeFeed = () => {
   const [scaleImage, setScaleImage] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
+  const [likes, setLikes] = useState(new Map());
 
   const handleSelectPost = (post: Post) => {
     setSelectedPost(post);
@@ -48,16 +50,25 @@ const HomeFeed = () => {
             throw new Error("Network response was not ok");
           }
 
-          const data = res.json();
-          return data;
+          return res.json();
         });
 
-      const fetchedPosts = data.posts.map((item: any, index: number) => ({
-        id: item._id,
-        title: `Post ${index + 1}`,
-        image: item.image,
-        post_number: item.post_number,
-      }));
+      const fetchedPosts = data.posts.map((item: any, index: number) => {
+
+        setLikes((prevLikes) => {
+          const newLikes = new Map(prevLikes);
+          newLikes.set(item._id, item.likes);
+          return newLikes;
+        });
+
+        return {
+          id: item._id,
+          title: `Post ${index + 1}`,
+          image: item.image,
+          post_number: item.post_number,
+          likes: item.likes
+        }
+      });
 
       console.log(fetchedPosts);
 
@@ -70,6 +81,60 @@ const HomeFeed = () => {
       toast.error("There was an error fetching images. Please try again later.");
     }
   };
+
+  const handleLike = async (postId: number) => {
+    // Optimistic UI updat
+
+    try {
+      const response = await fetch('/api/posts/likePost', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          postId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to like post.');
+      }
+
+      const data = await response.json();
+
+      if (data && data.message) {
+
+        if (data.message === 'Post liked') {
+          setLikes((prevLikes) => {
+            const newLikes = new Map(prevLikes);
+            newLikes.set(postId, (newLikes.get(postId) ?? 0) + 1);
+            return newLikes;
+          });
+        } else if (data.message === 'Post unliked') {
+          setLikes((prevLikes) => {
+            const newLikes = new Map(prevLikes);
+            newLikes.set(postId, (newLikes.get(postId) ?? 1) - 1);
+            return newLikes;
+          });
+        }
+
+        toast.success(data.message);
+      } else {
+        throw new Error('No message in response');
+      }
+    } catch (error) {
+      // Rollback the optimistic update if server fails
+      setLikes((prevLikes) => {
+        const newLikes = new Map(prevLikes);
+        newLikes.set(postId, (newLikes.get(postId) ?? 1) - 1);
+        return newLikes;
+      });
+
+      console.error('Error liking post:', error);
+      toast.error('Failed to like post.');
+    }
+  };
+
 
   useEffect(() => {
     fetchProfilePosts();
@@ -103,7 +168,9 @@ const HomeFeed = () => {
               </div>
             </Link>
             <div className="flex gap-5 text-sm">
-              <p>Likes</p>
+              <p onClick={(e) => handleLike(post.id)}>
+                {likes.get(post.id)} Likes
+              </p>
               <p>Comments</p>
             </div>
           </div>
