@@ -21,7 +21,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
     >
 
       <html lang="en">
-        <body className="bg-primary flex" suppressHydrationWarning>
+        <body className="bg-primary flex scrollbar" suppressHydrationWarning>
           <Sidebar />
           {children}
           <Toaster />

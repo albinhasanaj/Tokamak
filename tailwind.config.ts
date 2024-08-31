@@ -13,8 +13,8 @@ const config: Config = {
         secondary: "#2C394B",
       },
       fontFamily: {
-        cursive: ['"Cedarville Cursive"', 'cursive'],
-        istok: ['"Istok Web"', 'sans-serif'],
+        cursive: ['"Cedarville Cursive"', "cursive"],
+        istok: ['"Istok Web"', "sans-serif"],
       },
     }, screens: {
       'xs': '400px',
