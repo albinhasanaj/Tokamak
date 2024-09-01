@@ -69,8 +69,8 @@ const Sidebar = () => {
         <div>
 
             {/* Desktop Sidebar */}
-            <div className='hidden w-[300px] md:block p-5 h-screen'>
-                <div className='w-[300px] h-[95%] bg-secondary md:flex flex-col pt-5 justify-between self-center rounded-md fixed z-[9999]'>
+            <div className='hidden w-[300px] md:block p-5 h-screen '>
+                <div className='w-[300px] h-[95%] bg-secondary md:flex flex-col pt-5 justify-between self-center rounded-md fixed z-[9]'>
                     <div onClick={handleClose}>
                         <Image src="/images/logo.png" width={250} height={200} alt="Logo" className='mx-auto' draggable="false" />
                         <nav className='py-5'>
