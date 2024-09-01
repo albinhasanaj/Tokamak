@@ -14,6 +14,7 @@ export interface Post {
   height?: number;
   post_number: number;
   likes?: number;
+  caption?: string;
 }
 
 const HomeFeed = () => {
@@ -27,11 +28,15 @@ const HomeFeed = () => {
   const handleSelectPost = (post: Post) => {
     setSelectedPost(post);
     document.body.style.overflow = 'hidden'; // Disable body scroll
+    window.history.pushState(null, '', `${pathname}?post=${post.id}&post_title=${encodeURIComponent(post.title.replace(/ /g, '_'))}`);
+
   };
 
   const handleDisableSelectPost = () => {
     setSelectedPost(undefined);
     document.body.style.overflow = ''; // Re-enable body scroll
+    window.history.replaceState(null, '', pathname); // Remove query params
+
   };
 
   const handleScaleImage = () => {
@@ -66,7 +71,8 @@ const HomeFeed = () => {
           title: `Post ${index + 1}`,
           image: item.image,
           post_number: item.post_number,
-          likes: item.likes
+          likes: item.likes,
+          caption: item.caption
         }
       });
 
@@ -83,7 +89,7 @@ const HomeFeed = () => {
   };
 
   const handleLike = async (postId: number) => {
-    // Optimistic UI updat
+    // Optimistic UI update
 
     try {
       const response = await fetch('/api/posts/likePost', {
@@ -103,7 +109,6 @@ const HomeFeed = () => {
       const data = await response.json();
 
       if (data && data.message) {
-
         if (data.message === 'Post liked') {
           setLikes((prevLikes) => {
             const newLikes = new Map(prevLikes);
@@ -142,7 +147,7 @@ const HomeFeed = () => {
 
   return (
     <div className="relative min-h-screen text-white">
-      <div className={`flex flex-col gap-36 mt-20 justify-center px-5 ${selectedPost ? 'pointer-events-none blur-sm' : ''}`}>
+      <div className={`flex flex-col gap-16 sm:gap-24 lg:gap-36 mt-20 justify-center px-5 ${selectedPost ? 'pointer-events-none blur-sm' : ''}`}>
         {images.map((post: Post) => (
           <div key={post.id} className="flex flex-col items-center gap-2">
             <Link
@@ -152,7 +157,7 @@ const HomeFeed = () => {
               onClick={() => handleSelectPost(post)}
             >
               <div
-                className={`bg-gray-700 w-[600px] h-[600px] rounded-md relative cursor-pointer overflow-hidden transition-transform duration-300 ${selectedPost ? 'scale-110' : 'hover:scale-105'}`}
+                className={`bg-gray-700 w-[280px] h-[280px] sm:w-[420px] sm:h-[420px] lg:w-[600px] lg:h-[600px] rounded-md relative cursor-pointer overflow-hidden transition-transform duration-300 ${selectedPost ? 'scale-110' : 'hover:scale-105'}`}
               >
                 <Image
                   src={post.image}
@@ -167,6 +172,7 @@ const HomeFeed = () => {
                 </div>
               </div>
             </Link>
+            <p className="text-[#A4A4A4] text-sm">{post.caption}</p>
             <div className="flex gap-5 text-sm">
               <p onClick={(e) => handleLike(post.id)}>
                 {likes.get(post.id)} Likes
@@ -178,9 +184,9 @@ const HomeFeed = () => {
       </div>
       {selectedPost && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-20">
-          <div className="relative bg-gray-700 bg-opacity-50 h-[90vh] max-w-screen-lg max-h-screen rounded-lg overflow-hidden transition-transform duration-500">
+          <div className="relative bg-gray-700 bg-opacity-50 h-[90vh] w-[500px] lg:w-[850px] max-h-screen rounded-lg overflow-hidden transition-transform duration-500">
             <Link href={pathname ?? ''} passHref>
-              <button className="absolute top-4 left-4 bg-black bg-opacity-70 text-white rounded-full p-2 hover:bg-opacity-100 transition-opacity z-10" aria-label="Close"
+              <button className="absolute top-4 left-4 bg-black bg-opacity-70 text-white rounded-full p-2 hover:bg-opacity-100 transition-opacity z-[99]" aria-label="Close"
                 onClick={() => {
                   handleDisableSelectPost();
                   handleDisableScaleImage();
@@ -190,22 +196,39 @@ const HomeFeed = () => {
                 />
               </button>
             </Link>
-            <div className="flex items-center justify-center h-full flex-col gap-10">
+            <div className="flex items-center justify-center h-full flex-col">
               <div className='flex justify-center w-full h-full'>
                 <div className={`flex flex-col items-center gap-3 justify-center relative ${scaleImage ? 'z-50' : ''}`}>
                   <Image
                     src={selectedPost.image}
                     width={300}
                     height={300}
-                    className={`object-contain select-none max-h-[85%] max-w-full w-[450px] cursor-pointer transition-all duration-[350ms] z-40 ${scaleImage ? 'transform scale-150 translate-x-[50%] translate-y-[0%] left-1/2 top-1/2' : 'hover:scale-[1.02]'}`}
+                    className={`object-contain select-none max-h-[85%] max-w-full w-[500px] cursor-pointer transition-all duration-[350ms] z-40 ${scaleImage ? 'transform scale-150 translate-x-[50%] translate-y-[0%] left-1/2 top-1/2' : 'hover:scale-[1.02]'}`}
                     alt={`Image for post ${selectedPost.title}`}
                     onClick={handleScaleImage}
                   />
+
+
+                  <div className="flex flex-col text-white w-full px-4">
+                    <div className='flex justify-between items-center text-[16px] w-full mb-2'>
+                      <p className="text-[#A4A4A4] font-semibold">@Username</p>
+                      <p className="cursor-pointer hover:underline" onClick={(e) => handleLike(selectedPost.id)}>
+                        {likes.get(selectedPost.id)} Likes
+                      </p>
+                    </div>
+                    <div className=" text-[15px] text-gray-200 leading-6">
+                      <p className="break-all max-w-[80%]">
+                        {selectedPost.caption}
+                      </p>
+                    </div>
+                  </div>
+
+
                 </div>
                 <div className={`flex flex-col max-w-[400px] w-full justify-between h-full transition-opacity duration-300 ${scaleImage ? 'opacity-25 pointer-events-none' : 'opacity-100'}`}>
                   {/* Comment Section */}
                   <div className="overflow-auto scrollbar">
-                    <div className='flex flex-col items-center justify-center h-auto rounded-t-md border-l-[2px] border-[#4B5766]'>
+                    <div className='flex flex-col items-center justify-center h-auto border-l-[2px] border-[#4B5766]'>
                       <div className='flex flex-col gap-3 p-2 scrollbar'>
                         {comments.map((comment, index) => (
                           <p key={index} className='text-sm break-all scrollbar'><span className='font-bold text-cyan-400 break-all'>{comment.user}: </span>{comment.text}</p>
