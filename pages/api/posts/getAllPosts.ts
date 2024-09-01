@@ -20,10 +20,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const transformedPosts = myPosts.map(post => ({
             ...post, // Spread the original post
             likes: Array.isArray(post.likes) ? post.likes.length : 0, // Replace likes with its count
-            comments: Array.isArray(post.comments) ? post.comments.length : 0, // Also handle comments similarly if needed
         }));
 
         console.log(transformedPosts);
+
 
         return res.status(200).json({ posts: transformedPosts });
     } catch (error) {

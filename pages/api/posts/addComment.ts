@@ -1,8 +1,8 @@
+// api/posts/addComment.ts
 import { NextApiRequest, NextApiResponse } from "next";
 import { getAuth } from "@clerk/nextjs/server";
 import { connectToDB } from "@/lib/connectToDB";
 import Posts from "@/models/postSchema";
-import { randomUUID } from "crypto";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "POST") {
@@ -10,14 +10,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const { userId } = getAuth(req);
-    const { postId, comment } = req.body;
+    const { postId, text } = req.body;
 
     if (!userId) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    if (!postId) {
-        return res.status(400).json({ error: 'Post ID is required' });
+    if (!postId || !text) {
+        return res.status(400).json({ error: 'Post ID and comment text are required' });
     }
 
     try {
@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         // Add the comment
-        post.comments.push({ userId, comment });
+        post.comments.push({ userId, comment: text });
         await post.save();
 
         return res.status(200).json({ message: 'Comment added successfully' });
