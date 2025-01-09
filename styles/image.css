@@ -1,0 +1,12 @@
+.container {
+    width: 500px;
+    /* adjust to container size as needed */
+    height: 500px;
+    /* adjust to container size as needed */
+}
+
+.container img {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}

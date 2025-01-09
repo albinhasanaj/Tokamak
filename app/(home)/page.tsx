@@ -1,11 +1,12 @@
-import React from 'react'
+import HomeFeed from "@/components/HomeFeed";
+import React from "react";
 
 const Home = () => {
   return (
-    <div>
-      
-    </div>
-  )
-}
+    <main className="flex mx-auto gap-20 mt-20 flex-col">
+      <HomeFeed />
+    </main>
+  );
+};
 
-export default Home
+export default Home;
